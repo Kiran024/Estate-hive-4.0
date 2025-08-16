@@ -72,9 +72,8 @@ export default function AllProperties() {
       enriched.filter((p) => {
         const term = search.toLowerCase();
         const matchesSearch =
-          p.name.toLowerCase().includes(term) ||
-          p.location.toLowerCase().includes(term) ||
-          (p.phone || '').toLowerCase().includes(term);
+          p.title.toLowerCase().includes(term) ||
+          p.location.toLowerCase().includes(term);
         const matchesCategory = category === 'All' || p.category === category;
         const matchesLocation = location === 'All' || p.location === location;
         const matchesPrice =
@@ -109,18 +108,19 @@ export default function AllProperties() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen pt-28 pb-10">
+    <div className="bg-gray-50 min-h-screen pt-28 pb-10 ">
       <div className="max-w-7xl mx-auto px-4">
-        <h1 className="text-4xl font-bold text-gray-800 mb-10 text-center">Browse Properties</h1>
+        <h1 className="text-4xl font-bold text-gray-800 mb-10 text-center">Browse All Properties</h1>
         <div className="flex flex-col md:flex-row gap-8">
-          <aside className="md:w-1/4 bg-white rounded-xl shadow-md p-6 space-y-6 h-fit sticky top-28">
+          {/* Sidebar Filters */}
+          <aside className="md:w-1/4 bg-white rounded-xl shadow-md p-6 space-y-6 mr-10 h-fit sticky top-28">
             <h2 className="text-lg font-semibold text-gray-700">Filters</h2>
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700" htmlFor="search">Search</label>
               <input
                 id="search"
                 type="text"
-                placeholder="Search by name or location"
+                placeholder="Search by title or location"
                 className="w-full rounded-lg border border-gray-300 p-2 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -156,7 +156,7 @@ export default function AllProperties() {
                 step="0.01"
                 value={minPrice}
                 onChange={handleMinPriceChange}
-                className="w-full accent-indigo-600"
+                className="w-full bg-indigo-900"
               />
               <input
                 type="range"
@@ -165,7 +165,7 @@ export default function AllProperties() {
                 step="0.01"
                 value={maxPrice}
                 onChange={handleMaxPriceChange}
-                className="w-full accent-indigo-600"
+                className="w-full bg-indigo-900"
               />
               <div className="flex justify-between text-sm text-gray-600">
                 <span>{minPrice.toFixed(2)}</span>
@@ -181,6 +181,8 @@ export default function AllProperties() {
               </ModernSelect>
             </div>
           </aside>
+
+          {/* Properties Grid */}
           <section className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {sorted.map((p, idx) => (
               <div
@@ -189,17 +191,17 @@ export default function AllProperties() {
               >
                 <img
                   src={p.image}
-                  alt={p.name}
+                  alt={p.title}
                   className="w-full h-56 object-cover"
                 />
                 <div className="p-5 space-y-1">
-                  <h2 className="text-xl font-semibold text-gray-800">{p.name}</h2>
-                  <p className="text-sm text-indigo-600">{p.type}</p>
+                  <h2 className="text-xl font-semibold text-gray-800">{p.title}</h2>
+                  <p className="text-sm text-indigo-600">{p.category}</p>
                   <p className="text-gray-500">{p.location}</p>
                   <p className="text-indigo-600 font-bold">{p.price}</p>
-                  {p.phone && (
-                    <p className="text-sm text-gray-500">Phone: {p.phone}</p>
-                  )}
+                  <button className="bg-red-600 text-white text-[12px] cursor-pointer font-semibold px-3 py-1 rounded-full shadow hover:bg-red-700 transition duration-300">
+                    View Details
+                  </button>
                 </div>
               </div>
             ))}
@@ -209,4 +211,3 @@ export default function AllProperties() {
     </div>
   );
 }
-
