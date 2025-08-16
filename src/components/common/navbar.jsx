@@ -135,7 +135,7 @@ const userAvatar = storedImage || currentUser?.user_metadata?.avatar_url || '/de
 
         <ul className={`hidden md:flex space-x-8 text-lg ${isScrolled ? 'text-gray-800' : 'text-white'}`}>
           {menuItems.map((item) => (
-            <li key={item.name} onClick={() => handleNavigation(item.path)} className="cursor-pointer hover:text-red-600">
+            <li key={item.name} onClick={() => handleNavigation(item.path)} className="text-black">
               {item.name}
             </li>
           ))}

@@ -20,7 +20,7 @@ const AuthToggleButton = ({ handleNavigation }) => {
     >
       {/* Animated Sliding Background */}
       <motion.div
-        className="absolute top-0 left-0 w-1/2 h-full bg-indigo-900 rounded-full"
+        className="absolute top-0 left-0 w-1/2 h-full bg-[#1B1B59] rounded-full"
         animate={{ x: currentTab === "signup" ? "100%" : "0%" }}
         transition={{ type: "spring", stiffness: 300, damping: 25 }}
       />
@@ -31,7 +31,7 @@ const AuthToggleButton = ({ handleNavigation }) => {
           onClick={() => handleClick("login")}
           onMouseEnter={() => setHoverTab("login")}
           className={`w-1/2 h-full flex items-center justify-center transition-colors duration-300 ${
-            currentTab === "login" ? "text-white" : "text-indigo-900"
+            currentTab === "login" ? "text-white" : "text-[#1B1B59]"
           }`}
         >
           Login
@@ -41,7 +41,7 @@ const AuthToggleButton = ({ handleNavigation }) => {
           onClick={() => handleClick("signup")}
           onMouseEnter={() => setHoverTab("signup")}
           className={`w-1/2 h-full flex items-center justify-center transition-colors duration-300 ${
-            currentTab === "signup" ? "text-white" : "text-indigo-900"
+            currentTab === "signup" ? "text-white" : "text-[#1B1B59]"
           }`}
         >
           Signup
