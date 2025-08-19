@@ -63,9 +63,527 @@
 
 // export default data.map((p, i) => ({ ...p, image: images[i % images.length] }));
 
+// const properties = [
+//   {
+//     id: 1,
+//     title: "Konig Villas North County",
+//     type: "4 Bhk Villas",
+//     location: "Devanahalli",
+//     price: "2.46 - 3.21 Cr",
+//      beds: 4,
+//     baths: 4,
+//     parking: 2,
+//     phone: "8971492601",
+//     category: "For Sale",
+//     image: "/images/properties/Konig Villas North County.jpg"
+//   },
+//   {
+//     id: 2,
+//     title: "Barca At Godrej MSR City",
+//     type: "2/3 Bhk Apartment",
+//     location: "Devanahalli",
+//     price: "1.3 - 1.89 Cr",
+//      beds: 4,
+//   baths: 4,
+//   parking: 2,
+//     phone: "",
+//     category: "For Sale",
+//     image: "/images/properties/Barca At Godrej MSR City.jpg"
+//   },
+//   {
+//     id: 3,
+//     title: "Hybenden Clifton",
+//     type: "2/3 Bhk",
+//     location: "Devanahalli",
+//     price: "93.07 L - 1.64 Cr",
+//      beds: 4,
+//   baths: 4,
+//   parking: 2,
+//     phone: "",
+//     category: "For Sale",
+//     image: "/images/properties/Hybenden Clifton.jpg"
+//   },
+//   {
+//     id: 4,
+//     title: "Ebony at Brigade Orchards",
+//     type: "3/4 Bhk",
+//     location: "Devanahalli",
+//     price: "1.55 - 2.22 Cr",
+//      beds: 4,
+//   baths: 4,
+//   parking: 2,
+//     phone: "",
+//     category: "For Sale",
+//     image: "/images/properties/Ebony at Brigade Orchards.jpg"
+//   },
+//   {
+//     id: 5,
+//     title: "Provident Deansgate",
+//     type: "3 BHK",
+//     location: "Devanahall/IVC Road",
+//     price: "2.09 - 2.42 Cr",
+//      beds: 4,
+//   baths: 4,
+//   parking: 2,
+//     phone: "",
+//     category: "For Sale",
+//     image: "/images/properties/Provident Deansgate.jpg"
+//   },
+//   {
+//     id: 6,
+//     title: "Birla Trimaya Phase 3",
+//     type: "2/3/4 BHK",
+//     location: "Devanahalli",
+//     price: "1.12 - 3.16 Cr",
+//      beds: 4,
+//   baths: 4,
+//   parking: 2,
+//     phone: "",
+//     category: "For Sale",
+//     image: "/images/properties/Birla Trimaya Phase 3.jpg"
+//   },
+//   {
+//     id: 7,
+//     title: "Arvind The Park",
+//     type: "Plot",
+//     location: "Devanahalli",
+//     price: "80.65 L - 1.32 Cr",
+//      beds: 4,
+//   baths: 4,
+//   parking: 2,
+//     phone: "",
+//     category: "For Sale",
+//     image: "/images/properties/Arvind The Park.jpg"
+//   },
+//   {
+//     id: 8,
+//     title: "Earthsong by Manyata",
+//     type: "Plot",
+//     location: "Devanahalli",
+//     price: "40 L - 6.33 Cr",
+//      beds: 4,
+//   baths: 4,
+//   parking: 2,
+//     phone: "",
+//     category: "For Sale",
+//     image: "/images/properties/Earthsong by Manyata.jpg"
+//   },
+//   {
+//     id: 9,
+//     title: "The Secret Lake",
+//     type: "Plot",
+//     location: "Devanahalli",
+//     price: "72 L - 1.92 Cr",
+//      beds: 4,
+//   baths: 4,
+//   parking: 2,
+//     phone: "",
+//     category: "For Sale",
+//     image: "/images/properties/The Secret Lake.jpg"
+//   },
+//   {
+//     id: 10,
+//     title: "Vagmine Water Homes",
+//     type: "4 BHK",
+//     location: "Devanahalli",
+//     price: "4.5 Cr",
+//      beds: 4,
+//   baths: 4,
+//   parking: 2,
+//     phone: "",
+//     category: "For Sale",
+//     image: "/images/properties/Vagmine Water Homes.jpg"
+//   },
+//   {
+//     id: 11,
+//     title: "Brigade Oasis",
+//     type: "",
+//     location: "Devanahalli",
+//     price: "90 L - 1.8 Cr",
+//     phone: "",
+//     category: "For Sale",
+//     image: "/images/properties/Brigade Oasis.jpg"
+//   },
+//   {
+//     id: 12,
+//     title: "Mersuri Antelopes",
+//     type: "4 BHK",
+//     location: "Devanahalli",
+//     price: "3.98 - 4.34 Cr",
+//     phone: "",
+//     category: "For Sale",
+//     image: "/images/properties/Mersuri Antelopes.jpg"
+//   },
 
+//   // For Rent (13-24)
+//   {
+//     id: 13,
+//     title: "Century Trails",
+//     type: "Land",
+//     location: "Devanahalli",
+//     price: "86 L - 1.72 Cr",
+//     phone: "",
+//     category: "For Rent",
+//     image: "/images/properties/Century Trails.jpg"
+//   },
+//   {
+//     id: 14,
+//     title: "Signature One",
+//     type: "4 BHK",
+//     location: "Devanahalli",
+//     price: "2.87 - 3.41 Cr",
+//     phone: "",
+//     category: "For Rent",
+//     image: "/images/properties/Signature One.jpg"
+//   },
+//   {
+//     id: 15,
+//     title: "Brigade Atmosphere",
+//     type: "3/4 BHK",
+//     location: "Devanahalli",
+//     price: "1.02 - 4 Cr",
+//     phone: "",
+//     category: "For Rent",
+//     image: "/images/properties/Brigade Atmosphere.jpg"
+//   },
+//   {
+//     id: 16,
+//     title: "Total Environment",
+//     type: "Land",
+//     location: "Devanahalli",
+//     price: "1.56 - 6.25 Cr",
+//     phone: "",
+//     category: "For Rent",
+//     image: "/images/properties/Total Environment.jpg"
+//   },
+//   {
+//     id: 17,
+//     title: "Assetz Zen and Sato",
+//     type: "3/4 BHK",
+//     location: "Yelahanka",
+//     price: "2.70 Cr - 3.69 Cr",
+//     phone: "Aditi 9148032840 / Akhil 8792494788",
+//     category: "For Rent",
+//     image: "/images/properties/Assetz Zen and Sato1.jpg"
+//   },
+//   {
+//     id: 18,
+//     title: "Brigade Eternia",
+//     type: "1/3/4 BHK",
+//     location: "Yelahanka",
+//     price: "1.01 Cr - 4.62 Cr",
+//     phone: "",
+//     category: "For Rent",
+//     image: "/images/properties/Brigade Eternia1.jpg"
+//   },
+//   {
+//     id: 19,
+//     title: "Lodha Mirabelle",
+//     type: "2/3/4 BHK",
+//     location: "Hebbal",
+//     price: "1.49 Cr - 5.43 Cr",
+//     phone: "",
+//     category: "For Rent",
+//     image: "/images/properties/LodhaMirabelle1.jpg"
+//   },
+//   {
+//     id: 20,
+//     title: "SB Urban Park",
+//     type: "3/4 BHK",
+//     location: "Thanisandra",
+//     price: "1.77 - 3.38 Cr",
+//     phone: "",
+//     category: "For Rent",
+//     image: "/images/properties/SB Urban Park.jpg"
+//   },
+//   {
+//     id: 21,
+//     title: "Sumadhura Epitome",
+//     type: "2/3/4 BHK",
+//     location: "Hebbal",
+//     price: "1.46 - 2.39 Cr",
+//     phone: "",
+//     category: "For Rent",
+//     image: "/images/properties/Sumadhura Epitome.jpg"
+//   },
+//   {
+//     id: 22,
+//     title: "Montira by Rare earth",
+//     type: "Land",
+//     location: "Nandi Hills, Chikkaballapur",
+//     price: "70 L - 1.87 Cr",
+//     phone: "",
+//     category: "For Rent",
+//     image: "/images/properties/Montira by Rare earth.jpg"
+//   },
+//   {
+//     id: 23,
+//     title: "Keya Life by the Lake",
+//     type: "4/5 BHK",
+//     location: "Hebbal",
+//     price: "3.66 Cr - 4.18 Cr",
+//     phone: "",
+//     category: "For Rent",
+//     image: "/images/properties/Keya Life by the Lake.jpg"
+//   },
+//   {
+//     id: 24,
+//     title: "L&T Elara Celestia",
+//     type: "3/4 BHK",
+//     location: "Yelahanka",
+//     price: "2.9 Cr - 5.62 Cr",
+//     phone: "",
+//     category: "For Rent",
+//     image: "/images/properties/L&T Elara Celestia.jpg"
+//   },
+//   // Continue from previous entries (starting from id: 25)
+// {
+//     id: 25,
+//     title: "Concorde Mayfair",
+//     type: "3 BHK",
+//     location: "Yelahanka",
+//     price: "2.2 - 2.52 Cr",
+//     phone: "",
+//     category: "Luxury Rentals",
+//     image: "/images/properties/Concorde Mayfair.jpg"
+//   },
+//   {
+//     id: 26,
+//     title: "Casagrand Promenade",
+//     type: "2/3/4 BHK",
+//     location: "Yelahanka",
+//     price: "1 L - 2 Cr",
+//     phone: "",
+//     category: "Luxury Rentals",
+//     image: "/images/properties/Casagrand Promenade.jpg"
+//   },
+//   {
+//     id: 27,
+//     title: "Sobha Hamptons",
+//     type: "3/4 BHK",
+//     location: "Attibelle",
+//     price: "1.57 - 2.45 Cr",
+//     phone: "",
+//     category: "Luxury Rentals",
+//     image: "/images/properties/Sobha Hamptons.jpg"
+//   },
+//   {
+//     id: 28,
+//     title: "Total Environment - In That quiet earth",
+//     type: "2/3/4 BHK",
+//     location: "Hennur Road",
+//     price: "2.05 Cr - 6.05 Cr",
+//     phone: "",
+//     category: "Luxury Rentals",
+//     image: "/images/properties/Total Environment - In That quiet earth.jpg"
+//   },
+//   {
+//     id: 29,
+//     title: "Alpine Pyramid",
+//     type: "2/3/4 BHK",
+//     location: "Sahakara Nagar",
+//     price: "1.15 Cr - 2.23 Cr",
+//     phone: "",
+//     category: "Luxury Rentals",
+//     image: "/images/properties/Alpine Pyramid.jpg"
+//   },
+//   {
+//     id: 30,
+//     title: "RG Orchids Gardenia",
+//     type: "3 BHK",
+//     location: "Hebbal",
+//     price: "2.99 - 4.05 Cr",
+//     phone: "",
+//     category: "Luxury Rentals",
+//     image: "/images/properties/RG Orchids Gardenia.jpg"
+//   },
+//   {
+//     id: 31,
+//     title: "L&T Olivia",
+//     type: "3/4 BHK",
+//     location: "Hebbal",
+//     price: "2.75 - 3.88 Cr",
+//     phone: "",
+//     category: "Luxury Rentals",
+//     image: "/images/properties/L&T Olivia.jpg"
+//   },
+//   {
+//     id: 32,
+//     title: "TVS Isle of Trees",
+//     type: "3/4 BHK",
+//     location: "Hebbal",
+//     price: "1.83 - 2.89 Cr",
+//     phone: "",
+//     category: "Luxury Rentals",
+//     image: "/images/properties/TVS Isle of Trees.jpg"
+//   },
+//   {
+//     id: 33,
+//     title: "Sobha HRC Pristine",
+//     type: "3/4 BHK",
+//     location: "Jakkur",
+//     price: "2.98 - 7 Cr",
+//     phone: "",
+//     category: "Luxury Rentals",
+//     image: "/images/properties/Sobha HRC Pristine.jpg"
+//   },
+//   {
+//     id: 34,
+//     title: "Ranka Ankura",
+//     type: "2/3/4 BHK",
+//     location: "Thanisandra",
+//     price: "1.2 Cr - 2 Cr",
+//     phone: "",
+//     category: "Luxury Rentals",
+//     image: "/images/properties/Ranka Ankura.jpg"
+//   },
+//   {
+//     id: 35,
+//     title: "Prestige Camden Gardens",
+//     type: "3/4 BHK",
+//     location: "Thanisandra",
+//     price: "2.28 Cr - 3.82 Cr",
+//     phone: "",
+//     category: "Luxury Rentals",
+//     image: "/images/properties/Prestige Camden Gardens.jpg"
+//   },
+//   {
+//     id: 36,
+//     title: "Vajram Vivera",
+//     type: "3/4 BHK",
+//     location: "Thanisandra",
+//     price: "1.81 Cr - 2.89 Cr",
+//     phone: "",
+//     category: "Luxury Rentals",
+//     image: "/images/properties/Vajram Vivera.jpg"
+//   },
 
+//   // EH Signature™ (37-48)
+//   {
+//     id: 37,
+//     title: "Total Down by the water",
+//     type: "3/4 BHK",
+//     location: "Yelahanka",
+//     price: "4.49 - 11.75 Cr",
+//     phone: "",
+//     category: "EH Signature™",
+//     image: "/images/properties/Total Down by the water.jpg"
+//   },
+//   {
+//     id: 38,
+//     title: "Surya Valencia",
+//     type: "4/5 BHK",
+//     location: "Yelahanka",
+//     price: "3.33 - 3.79 Cr",
+//     phone: "",
+//     category: "EH Signature™",
+//     image: "/images/properties/Surya Valencia.jpg"
+//   },
+//   {
+//     id: 39,
+//     title: "Elegant Takt Tropical Symphony",
+//     type: "2/3/4 BHK",
+//     location: "Yelahanka",
+//     price: "1.3 Cr - 2.6 Cr",
+//     phone: "",
+//     category: "EH Signature™",
+//     image: "/images/properties/Elegant Takt Tropical Symphony.jpg"
+//   },
+//   {
+//     id: 40,
+//     title: "Visista By Vista Spaces Okas",
+//     type: "2/3 BHK",
+//     location: "Yelahanka",
+//     price: "3.81 Cr",
+//     phone: "",
+//     category: "EH Signature™",
+//     image: "/images/properties/Visista By Vista Spaces Okas.jpg"
+//   },
+//   {
+//     id: 41,
+//     title: "Assetz Sora and Saki",
+//     type: "3/4 BHK",
+//     location: "Bagalur",
+//     price: "1.94 Cr - 2.5 Cr",
+//     phone: "",
+//     category: "EH Signature™",
+//     image: "/images/properties/Assetz Sora and Saki.jpg"
+//   },
+//   {
+//     id: 42,
+//     title: "Brigade El Dorado",
+//     type: "2/3/4 BHK",
+//     location: "Bagalur",
+//     price: "67 L - 2.03 Cr",
+//     phone: "",
+//     category: "EH Signature™",
+//     image: "/images/properties/Brigade El Dorado.jpg"
+//   },
+//   {
+//     id: 43,
+//     title: "Godrej Ananda",
+//     type: "2/3 BHK",
+//     location: "Bagalur",
+//     price: "1.14 - 1.92 Cr",
+//     phone: "",
+//     category: "EH Signature™",
+//     image: "/images/properties/Godrej Ananda.jpg"
+//   },
+//   {
+//     id: 44,
+//     title: "DNR Parklink",
+//     type: "2/3/4 BHK",
+//     location: "Hennur Road",
+//     price: "1.32 - 2.42 Cr",
+//     phone: "",
+//     category: "EH Signature™",
+//     image: "/images/properties/DNR Parklink.jpg"
+//   },
+//   {
+//     id: 45,
+//     title: "Kolte Patil Lakeside",
+//     type: "2/3/4 BHK",
+//     location: "Hennur Road",
+//     price: "97.77 L - 2.46 Cr",
+//     phone: "",
+//     category: "EH Signature™",
+//     image: "/images/properties/Kolte Patil Lakeside.jpg"
+//   },
+//   {
+//     id: 46,
+//     title: "Living Walls Hush Fields",
+//     type: "Plots",
+//     location: "Hennur Road",
+//     price: "3.6 Cr",
+//     phone: "",
+//     category: "EH Signature™",
+//     image: "/images/properties/Living Walls Hush Fields.jpg"
+//   },
+//   {
+//     id: 47,
+//     title: "Living Walls True North",
+//     type: "3/4 BHK",
+//     location: "Hennur Road",
+//     price: "2.11 Cr",
+//     phone: "",
+//     category: "EH Signature™",
+//     image: "/images/properties/Living Walls True North.jpg"
+//   },
+//   {
+//     id: 48,
+//     title: "Mantri Webcity",
+//     type: "3 BHK",
+//     location: "Hennur Main Road",
+//     price: "1.85 Cr",
+//     phone: "",
+//     category: "EH Signature™",
+//     image: "/images/properties/Mantri Webcity.jpg"
+//   }
+// ];
 
+// export default properties;
+
+// src/data/properties.js
 const properties = [
   {
     id: 1,
@@ -73,9 +591,16 @@ const properties = [
     type: "4 Bhk Villas",
     location: "Devanahalli",
     price: "2.46 - 3.21 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "8971492601",
     category: "For Sale",
-    image: "/images/properties/Konig Villas North County.jpg"
+    description:
+      "Konig Villas North County in Devanahalli offers 4 Bhk Villas with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Konig Villas North County.jpg"],
+    map: { lat: 13.2477, lng: 77.7033 },
   },
   {
     id: 2,
@@ -83,9 +608,16 @@ const properties = [
     type: "2/3 Bhk Apartment",
     location: "Devanahalli",
     price: "1.3 - 1.89 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "For Sale",
-    image: "/images/properties/Barca At Godrej MSR City.jpg"
+    description:
+      "Barca At Godrej MSR City in Devanahalli offers 2/3 Bhk Apartment with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Barca At Godrej MSR City.jpg"],
+    map: { lat: 13.2477, lng: 77.7033 },
   },
   {
     id: 3,
@@ -93,9 +625,16 @@ const properties = [
     type: "2/3 Bhk",
     location: "Devanahalli",
     price: "93.07 L - 1.64 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "For Sale",
-    image: "/images/properties/Hybenden Clifton.jpg"
+    description:
+      "Hybenden Clifton in Devanahalli offers 2/3 Bhk with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Hybenden Clifton.jpg"],
+    map: { lat: 13.2477, lng: 77.7033 },
   },
   {
     id: 4,
@@ -103,9 +642,16 @@ const properties = [
     type: "3/4 Bhk",
     location: "Devanahalli",
     price: "1.55 - 2.22 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "For Sale",
-    image: "/images/properties/Ebony at Brigade Orchards.jpg"
+    description:
+      "Ebony at Brigade Orchards in Devanahalli offers 3/4 Bhk with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Ebony at Brigade Orchards.jpg"],
+    map: { lat: 13.2477, lng: 77.7033 },
   },
   {
     id: 5,
@@ -113,9 +659,16 @@ const properties = [
     type: "3 BHK",
     location: "Devanahall/IVC Road",
     price: "2.09 - 2.42 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "For Sale",
-    image: "/images/properties/Provident Deansgate.jpg"
+    description:
+      "Provident Deansgate on Devanahall/IVC Road offers 3 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Provident Deansgate.jpg"],
+    map: { lat: 13.263, lng: 77.7035 },
   },
   {
     id: 6,
@@ -123,9 +676,16 @@ const properties = [
     type: "2/3/4 BHK",
     location: "Devanahalli",
     price: "1.12 - 3.16 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "For Sale",
-    image: "/images/properties/Birla Trimaya Phase 3.jpg"
+    description:
+      "Birla Trimaya Phase 3 in Devanahalli offers 2/3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Birla Trimaya Phase 3.jpg"],
+    map: { lat: 13.2477, lng: 77.7033 },
   },
   {
     id: 7,
@@ -133,9 +693,16 @@ const properties = [
     type: "Plot",
     location: "Devanahalli",
     price: "80.65 L - 1.32 Cr",
+    bhk: 0,
+    baths: 0,
+    parking: 0,
     phone: "",
     category: "For Sale",
-    image: "/images/properties/Arvind The Park.jpg"
+    description:
+      "Arvind The Park in Devanahalli offers premium plots with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Arvind The Park.jpg"],
+    map: { lat: 13.2477, lng: 77.7033 },
   },
   {
     id: 8,
@@ -143,9 +710,16 @@ const properties = [
     type: "Plot",
     location: "Devanahalli",
     price: "40 L - 6.33 Cr",
+    bhk: 0,
+    baths: 0,
+    parking: 0,
     phone: "",
     category: "For Sale",
-    image: "/images/properties/Earthsong by Manyata.jpg"
+    description:
+      "Earthsong by Manyata in Devanahalli offers premium plots with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Earthsong by Manyata.jpg"],
+    map: { lat: 13.2477, lng: 77.7033 },
   },
   {
     id: 9,
@@ -153,9 +727,16 @@ const properties = [
     type: "Plot",
     location: "Devanahalli",
     price: "72 L - 1.92 Cr",
+    bhk: 0,
+    baths: 0,
+    parking: 0,
     phone: "",
     category: "For Sale",
-    image: "/images/properties/The Secret Lake.jpg"
+    description:
+      "The Secret Lake in Devanahalli offers premium plots with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/The Secret Lake.jpg"],
+    map: { lat: 13.2477, lng: 77.7033 },
   },
   {
     id: 10,
@@ -163,9 +744,16 @@ const properties = [
     type: "4 BHK",
     location: "Devanahalli",
     price: "4.5 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "For Sale",
-    image: "/images/properties/Vagmine Water Homes.jpg"
+    description:
+      "Vagmine Water Homes in Devanahalli offers 4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Vagmine Water Homes.jpg"],
+    map: { lat: 13.2477, lng: 77.7033 },
   },
   {
     id: 11,
@@ -173,9 +761,16 @@ const properties = [
     type: "",
     location: "Devanahalli",
     price: "90 L - 1.8 Cr",
+    bhk: 0,
+    baths: 0,
+    parking: 0,
     phone: "",
     category: "For Sale",
-    image: "/images/properties/Brigade Oasis.jpg"
+    description:
+      "Brigade Oasis in Devanahalli offers residences with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Brigade Oasis.jpg"],
+    map: { lat: 13.2477, lng: 77.7033 },
   },
   {
     id: 12,
@@ -183,21 +778,33 @@ const properties = [
     type: "4 BHK",
     location: "Devanahalli",
     price: "3.98 - 4.34 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "For Sale",
-    image: "/images/properties/Mersuri Antelopes.jpg"
+    description:
+      "Mersuri Antelopes in Devanahalli offers 4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Mersuri Antelopes.jpg"],
+    map: { lat: 13.2477, lng: 77.7033 },
   },
-
-  // For Rent (13-24)
   {
     id: 13,
     title: "Century Trails",
     type: "Land",
     location: "Devanahalli",
     price: "86 L - 1.72 Cr",
+    bhk: 0,
+    baths: 0,
+    parking: 0,
     phone: "",
     category: "For Rent",
-    image: "/images/properties/Century Trails.jpg"
+    description:
+      "Century Trails in Devanahalli offers premium land with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Century Trails.jpg"],
+    map: { lat: 13.2477, lng: 77.7033 },
   },
   {
     id: 14,
@@ -205,9 +812,16 @@ const properties = [
     type: "4 BHK",
     location: "Devanahalli",
     price: "2.87 - 3.41 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "For Rent",
-    image: "/images/properties/Signature One.jpg"
+    description:
+      "Signature One in Devanahalli offers 4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Signature One.jpg"],
+    map: { lat: 13.2477, lng: 77.7033 },
   },
   {
     id: 15,
@@ -215,9 +829,16 @@ const properties = [
     type: "3/4 BHK",
     location: "Devanahalli",
     price: "1.02 - 4 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "For Rent",
-    image: "/images/properties/Brigade Atmosphere.jpg"
+    description:
+      "Brigade Atmosphere in Devanahalli offers 3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Brigade Atmosphere.jpg"],
+    map: { lat: 13.2477, lng: 77.7033 },
   },
   {
     id: 16,
@@ -225,9 +846,16 @@ const properties = [
     type: "Land",
     location: "Devanahalli",
     price: "1.56 - 6.25 Cr",
+    bhk: 0,
+    baths: 0,
+    parking: 0,
     phone: "",
     category: "For Rent",
-    image: "/images/properties/Total Environment.jpg"
+    description:
+      "Total Environment in Devanahalli offers premium land with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Total Environment.jpg"],
+    map: { lat: 13.2477, lng: 77.7033 },
   },
   {
     id: 17,
@@ -235,9 +863,16 @@ const properties = [
     type: "3/4 BHK",
     location: "Yelahanka",
     price: "2.70 Cr - 3.69 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "Aditi 9148032840 / Akhil 8792494788",
     category: "For Rent",
-    image: "/images/properties/Assetz Zen and Sato1.jpg"
+    description:
+      "Assetz Zen and Sato in Yelahanka offers 3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Assetz Zen and Sato1.jpg"],
+    map: { lat: 13.0924, lng: 77.5946 },
   },
   {
     id: 18,
@@ -245,9 +880,16 @@ const properties = [
     type: "1/3/4 BHK",
     location: "Yelahanka",
     price: "1.01 Cr - 4.62 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "For Rent",
-    image: "/images/properties/Brigade Eternia1.jpg"
+    description:
+      "Brigade Eternia in Yelahanka offers 1/3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Brigade Eternia1.jpg"],
+    map: { lat: 13.0924, lng: 77.5946 },
   },
   {
     id: 19,
@@ -255,9 +897,16 @@ const properties = [
     type: "2/3/4 BHK",
     location: "Hebbal",
     price: "1.49 Cr - 5.43 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "For Rent",
-    image: "/images/properties/LodhaMirabelle1.jpg"
+    description:
+      "Lodha Mirabelle in Hebbal offers 2/3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/LodhaMirabelle1.jpg"],
+    map: { lat: 13.0355, lng: 77.597 },
   },
   {
     id: 20,
@@ -265,9 +914,16 @@ const properties = [
     type: "3/4 BHK",
     location: "Thanisandra",
     price: "1.77 - 3.38 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "For Rent",
-    image: "/images/properties/SB Urban Park.jpg"
+    description:
+      "SB Urban Park in Thanisandra offers 3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/SB Urban Park.jpg"],
+    map: { lat: 13.0465, lng: 77.6521 },
   },
   {
     id: 21,
@@ -275,9 +931,16 @@ const properties = [
     type: "2/3/4 BHK",
     location: "Hebbal",
     price: "1.46 - 2.39 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "For Rent",
-    image: "/images/properties/Sumadhura Epitome.jpg"
+    description:
+      "Sumadhura Epitome in Hebbal offers 2/3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Sumadhura Epitome.jpg"],
+    map: { lat: 13.0355, lng: 77.597 },
   },
   {
     id: 22,
@@ -285,9 +948,16 @@ const properties = [
     type: "Land",
     location: "Nandi Hills, Chikkaballapur",
     price: "70 L - 1.87 Cr",
+    bhk: 0,
+    baths: 0,
+    parking: 0,
     phone: "",
     category: "For Rent",
-    image: "/images/properties/Montira by Rare earth.jpg"
+    description:
+      "Montira by Rare earth in Nandi Hills offers premium land with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Montira by Rare earth.jpg"],
+    map: { lat: 13.3702, lng: 77.6835 },
   },
   {
     id: 23,
@@ -295,9 +965,16 @@ const properties = [
     type: "4/5 BHK",
     location: "Hebbal",
     price: "3.66 Cr - 4.18 Cr",
+    bhk: 5,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "For Rent",
-    image: "/images/properties/Keya Life by the Lake.jpg"
+    description:
+      "Keya Life by the Lake in Hebbal offers 4/5 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Keya Life by the Lake.jpg"],
+    map: { lat: 13.0355, lng: 77.597 },
   },
   {
     id: 24,
@@ -305,20 +982,33 @@ const properties = [
     type: "3/4 BHK",
     location: "Yelahanka",
     price: "2.9 Cr - 5.62 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "For Rent",
-    image: "/images/properties/L&T Elara Celestia.jpg"
+    description:
+      "L&T Elara Celestia in Yelahanka offers 3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/L&T Elara Celestia.jpg"],
+    map: { lat: 13.0924, lng: 77.5946 },
   },
-  // Continue from previous entries (starting from id: 25)
-{
+  {
     id: 25,
     title: "Concorde Mayfair",
     type: "3 BHK",
     location: "Yelahanka",
     price: "2.2 - 2.52 Cr",
+    bhk: 3,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "Luxury Rentals",
-    image: "/images/properties/Concorde Mayfair.jpg"
+    description:
+      "Concorde Mayfair in Yelahanka offers 3 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Concorde Mayfair.jpg"],
+    map: { lat: 13.0924, lng: 77.5946 },
   },
   {
     id: 26,
@@ -326,9 +1016,16 @@ const properties = [
     type: "2/3/4 BHK",
     location: "Yelahanka",
     price: "1 L - 2 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "Luxury Rentals",
-    image: "/images/properties/Casagrand Promenade.jpg"
+    description:
+      "Casagrand Promenade in Yelahanka offers 2/3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Casagrand Promenade.jpg"],
+    map: { lat: 13.0924, lng: 77.5946 },
   },
   {
     id: 27,
@@ -336,9 +1033,16 @@ const properties = [
     type: "3/4 BHK",
     location: "Attibelle",
     price: "1.57 - 2.45 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "Luxury Rentals",
-    image: "/images/properties/Sobha Hamptons.jpg"
+    description:
+      "Sobha Hamptons in Attibelle offers 3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Sobha Hamptons.jpg"],
+    map: { lat: 12.7809, lng: 77.7672 },
   },
   {
     id: 28,
@@ -346,9 +1050,16 @@ const properties = [
     type: "2/3/4 BHK",
     location: "Hennur Road",
     price: "2.05 Cr - 6.05 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "Luxury Rentals",
-    image: "/images/properties/Total Environment - In That quiet earth.jpg"
+    description:
+      "Total Environment - In That quiet earth on Hennur Road offers 2/3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Total Environment - In That quiet earth.jpg"],
+    map: { lat: 13.0397, lng: 77.6408 },
   },
   {
     id: 29,
@@ -356,9 +1067,16 @@ const properties = [
     type: "2/3/4 BHK",
     location: "Sahakara Nagar",
     price: "1.15 Cr - 2.23 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "Luxury Rentals",
-    image: "/images/properties/Alpine Pyramid.jpg"
+    description:
+      "Alpine Pyramid in Sahakara Nagar offers 2/3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Alpine Pyramid.jpg"],
+    map: { lat: 13.0472, lng: 77.579 },
   },
   {
     id: 30,
@@ -366,9 +1084,16 @@ const properties = [
     type: "3 BHK",
     location: "Hebbal",
     price: "2.99 - 4.05 Cr",
+    bhk: 3,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "Luxury Rentals",
-    image: "/images/properties/RG Orchids Gardenia.jpg"
+    description:
+      "RG Orchids Gardenia in Hebbal offers 3 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/RG Orchids Gardenia.jpg"],
+    map: { lat: 13.0355, lng: 77.597 },
   },
   {
     id: 31,
@@ -376,9 +1101,15 @@ const properties = [
     type: "3/4 BHK",
     location: "Hebbal",
     price: "2.75 - 3.88 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "Luxury Rentals",
-    image: "/images/properties/L&T Olivia.jpg"
+    description: "L&T Olivia in Hebbal offers 3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/L&T Olivia.jpg"],
+    map: { lat: 13.0355, lng: 77.597 },
   },
   {
     id: 32,
@@ -386,9 +1117,16 @@ const properties = [
     type: "3/4 BHK",
     location: "Hebbal",
     price: "1.83 - 2.89 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "Luxury Rentals",
-    image: "/images/properties/TVS Isle of Trees.jpg"
+    description:
+      "TVS Isle of Trees in Hebbal offers 3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/TVS Isle of Trees.jpg"],
+    map: { lat: 13.0355, lng: 77.597 },
   },
   {
     id: 33,
@@ -396,9 +1134,16 @@ const properties = [
     type: "3/4 BHK",
     location: "Jakkur",
     price: "2.98 - 7 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "Luxury Rentals",
-    image: "/images/properties/Sobha HRC Pristine.jpg"
+    description:
+      "Sobha HRC Pristine in Jakkur offers 3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Sobha HRC Pristine.jpg"],
+    map: { lat: 13.0881, lng: 77.5978 },
   },
   {
     id: 34,
@@ -406,9 +1151,16 @@ const properties = [
     type: "2/3/4 BHK",
     location: "Thanisandra",
     price: "1.2 Cr - 2 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "Luxury Rentals",
-    image: "/images/properties/Ranka Ankura.jpg"
+    description:
+      "Ranka Ankura in Thanisandra offers 2/3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Ranka Ankura.jpg"],
+    map: { lat: 13.0465, lng: 77.6521 },
   },
   {
     id: 35,
@@ -416,9 +1168,16 @@ const properties = [
     type: "3/4 BHK",
     location: "Thanisandra",
     price: "2.28 Cr - 3.82 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "Luxury Rentals",
-    image: "/images/properties/Prestige Camden Gardens.jpg"
+    description:
+      "Prestige Camden Gardens in Thanisandra offers 3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Prestige Camden Gardens.jpg"],
+    map: { lat: 13.0465, lng: 77.6521 },
   },
   {
     id: 36,
@@ -426,21 +1185,33 @@ const properties = [
     type: "3/4 BHK",
     location: "Thanisandra",
     price: "1.81 Cr - 2.89 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "Luxury Rentals",
-    image: "/images/properties/Vajram Vivera.jpg"
+    description:
+      "Vajram Vivera in Thanisandra offers 3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Vajram Vivera.jpg"],
+    map: { lat: 13.0465, lng: 77.6521 },
   },
-
-  // EH Signature™ (37-48)
   {
     id: 37,
     title: "Total Down by the water",
     type: "3/4 BHK",
     location: "Yelahanka",
     price: "4.49 - 11.75 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "EH Signature™",
-    image: "/images/properties/Total Down by the water.jpg"
+    description:
+      "Total Down by the water in Yelahanka offers 3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Total Down by the water.jpg"],
+    map: { lat: 13.0924, lng: 77.5946 },
   },
   {
     id: 38,
@@ -448,9 +1219,16 @@ const properties = [
     type: "4/5 BHK",
     location: "Yelahanka",
     price: "3.33 - 3.79 Cr",
+    bhk: 5,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "EH Signature™",
-    image: "/images/properties/Surya Valencia.jpg"
+    description:
+      "Surya Valencia in Yelahanka offers 4/5 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Surya Valencia.jpg"],
+    map: { lat: 13.0924, lng: 77.5946 },
   },
   {
     id: 39,
@@ -458,9 +1236,16 @@ const properties = [
     type: "2/3/4 BHK",
     location: "Yelahanka",
     price: "1.3 Cr - 2.6 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "EH Signature™",
-    image: "/images/properties/Elegant Takt Tropical Symphony.jpg"
+    description:
+      "Elegant Takt Tropical Symphony in Yelahanka offers 2/3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Elegant Takt Tropical Symphony.jpg"],
+    map: { lat: 13.0924, lng: 77.5946 },
   },
   {
     id: 40,
@@ -468,9 +1253,16 @@ const properties = [
     type: "2/3 BHK",
     location: "Yelahanka",
     price: "3.81 Cr",
+    bhk: 3,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "EH Signature™",
-    image: "/images/properties/Visista By Vista Spaces Okas.jpg"
+    description:
+      "Visista By Vista Spaces Okas in Yelahanka offers 2/3 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Visista By Vista Spaces Okas.jpg"],
+    map: { lat: 13.0924, lng: 77.5946 },
   },
   {
     id: 41,
@@ -478,9 +1270,16 @@ const properties = [
     type: "3/4 BHK",
     location: "Bagalur",
     price: "1.94 Cr - 2.5 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "EH Signature™",
-    image: "/images/properties/Assetz Sora and Saki.jpg"
+    description:
+      "Assetz Sora and Saki in Bagalur offers 3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Assetz Sora and Saki.jpg"],
+    map: { lat: 13.1336, lng: 77.6715 },
   },
   {
     id: 42,
@@ -488,9 +1287,16 @@ const properties = [
     type: "2/3/4 BHK",
     location: "Bagalur",
     price: "67 L - 2.03 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "EH Signature™",
-    image: "/images/properties/Brigade El Dorado.jpg"
+    description:
+      "Brigade El Dorado in Bagalur offers 2/3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Brigade El Dorado.jpg"],
+    map: { lat: 13.1336, lng: 77.6715 },
   },
   {
     id: 43,
@@ -498,9 +1304,16 @@ const properties = [
     type: "2/3 BHK",
     location: "Bagalur",
     price: "1.14 - 1.92 Cr",
+    bhk: 3,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "EH Signature™",
-    image: "/images/properties/Godrej Ananda.jpg"
+    description:
+      "Godrej Ananda in Bagalur offers 2/3 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Godrej Ananda.jpg"],
+    map: { lat: 13.1336, lng: 77.6715 },
   },
   {
     id: 44,
@@ -508,9 +1321,16 @@ const properties = [
     type: "2/3/4 BHK",
     location: "Hennur Road",
     price: "1.32 - 2.42 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "EH Signature™",
-    image: "/images/properties/DNR Parklink.jpg"
+    description:
+      "DNR Parklink on Hennur Road offers 2/3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/DNR Parklink.jpg"],
+    map: { lat: 13.0397, lng: 77.6408 },
   },
   {
     id: 45,
@@ -518,9 +1338,16 @@ const properties = [
     type: "2/3/4 BHK",
     location: "Hennur Road",
     price: "97.77 L - 2.46 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "EH Signature™",
-    image: "/images/properties/Kolte Patil Lakeside.jpg"
+    description:
+      "Kolte Patil Lakeside on Hennur Road offers 2/3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Kolte Patil Lakeside.jpg"],
+    map: { lat: 13.0397, lng: 77.6408 },
   },
   {
     id: 46,
@@ -528,9 +1355,16 @@ const properties = [
     type: "Plots",
     location: "Hennur Road",
     price: "3.6 Cr",
+    bhk: 0,
+    baths: 0,
+    parking: 0,
     phone: "",
     category: "EH Signature™",
-    image: "/images/properties/Living Walls Hush Fields.jpg"
+    description:
+      "Living Walls Hush Fields on Hennur Road offers premium plots with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Living Walls Hush Fields.jpg"],
+    map: { lat: 13.0397, lng: 77.6408 },
   },
   {
     id: 47,
@@ -538,9 +1372,16 @@ const properties = [
     type: "3/4 BHK",
     location: "Hennur Road",
     price: "2.11 Cr",
+    bhk: 4,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "EH Signature™",
-    image: "/images/properties/Living Walls True North.jpg"
+    description:
+      "Living Walls True North on Hennur Road offers 3/4 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Living Walls True North.jpg"],
+    map: { lat: 13.0397, lng: 77.6408 },
   },
   {
     id: 48,
@@ -548,10 +1389,17 @@ const properties = [
     type: "3 BHK",
     location: "Hennur Main Road",
     price: "1.85 Cr",
+    bhk: 3,
+    baths: 4,
+    parking: 2,
     phone: "",
     category: "EH Signature™",
-    image: "/images/properties/Mantri Webcity.jpg"
-  }
+    description:
+      "Mantri Webcity on Hennur Main Road offers 3 BHK with modern amenities.",
+    features: ["Gated Community", "Club House", "Security"],
+    images: ["/images/properties/Mantri Webcity.jpg"],
+    map: { lat: 13.0369, lng: 77.65 },
+  },
 ];
 
 export default properties;

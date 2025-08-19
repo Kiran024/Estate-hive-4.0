@@ -522,31 +522,20 @@ const deriveTitleFromImage = (img) => {
 
 /* Normalizer: robustly pick a title and other fields */
 const normalizeRaw = (p = {}) => {
-  // accept many possible title keys
   const rawTitle = (p.title || "").toString().trim();
-const derived = deriveTitleFromImage(p.image ?? p.img ?? p.src);
-const title = rawTitle.length > 0 ? rawTitle : (derived || `Property ${p.id ?? ""}`.trim() || "Untitled Property");
-  const image = (p.image || p.img || p.src || "/images/properties/placeholder.jpg") + "";
+  const firstImage = Array.isArray(p.images) && p.images.length ? p.images[0] : undefined;
+  const derived = deriveTitleFromImage(p.image ?? p.img ?? p.src ?? firstImage);
+  const title =
+    rawTitle.length > 0 ? rawTitle : derived || `Property ${p.id ?? ""}` || "Untitled Property";
+  const image =
+    p.image || p.img || p.src || firstImage || "/images/properties/Konig Villas North County.jpg";
   const location = (p.location || p.city || p.area || p.town || "") + "";
   const type = (p.type || p.bhk || p.propertyType || "") + "";
   const area = (p.area || p.sqft || p.size || "") + "";
   const price = (p.price || p.rate || "") + "";
-  // category normalization for matching tabs (lowercase trimmed)
   const rawCategory = (p.category || p.tag || p.listingType || "").toString().trim();
   const categoryNormalized = rawCategory.toLowerCase();
-
-  return {
-    id: p.id ?? `${title}-${Math.random().toString(36).slice(2, 7)}`,
-    title,
-    image,
-    location,
-    type,
-    area,
-    price,
-    category: rawCategory,
-    categoryNormalized,
-    raw: p,
-  };
+  return { id: p.id ?? `${title}-${Math.random().toString(36).slice(2, 7)}`, title, image, location, type, area, price, category: rawCategory, categoryNormalized, raw: p };
 };
 
 /* Determine the source array even if properties file used a named export or wrapped object */

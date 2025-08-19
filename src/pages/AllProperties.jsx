@@ -219,6 +219,7 @@
 import React, { useState, useMemo } from 'react';
 import properties from '../data/properties';
 import { FiChevronDown } from 'react-icons/fi';
+import { Link } from "react-router-dom";
 import { Range } from 'react-range';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
@@ -410,7 +411,11 @@ export default function AllProperties() {
       key={idx}
       className="bg-white rounded-xl border border-gray-100 shadow hover:shadow-xl transition overflow-hidden flex flex-col h-full"
     >
-      <img src={p.image} alt={p.title} className="w-full h-56 object-cover" />
+      <img
+   src={p.images && p.images.length ? p.images[0] : "/images/properties/placeholder.jpg"}
+  alt={p.title}
+  className="w-full h-56 object-cover"
+/>
       <div className="p-5 flex flex-col flex-1">
         <div className="space-y-1">
           <h2 className="text-xl font-semibold text-gray-800">{p.title}</h2>
@@ -420,9 +425,12 @@ export default function AllProperties() {
 
         <div className="mt-auto flex flex-col items-start">
           <p className="text-[#1B1B59] font-bold">{p.price}</p>
-          <button className="mt-2 self-start w-fit bg-red-600 text-white text-[12px] cursor-pointer font-semibold px-3 py-1 rounded-full shadow hover:bg-red-700 transition duration-300">
-            View Details
-          </button>
+          <Link
+  to={`/properties/${p.id}`}
+  className="mt-2 self-start w-fit bg-[#1F275E] text-white text-[12px] font-semibold px-3 py-1 rounded-full shadow hover:bg-[#0f1646] transition duration-300"
+>
+  View Details
+</Link>
         </div>
       </div>
     </div>
