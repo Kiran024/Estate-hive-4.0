@@ -225,6 +225,8 @@ import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const categories = ['All', 'For Sale', 'For Rent', 'Luxury Rentals', 'EH Signature™'];
 
+// --- HELPER COMPONENTS AND FUNCTIONS (UNCHANGED) ---
+
 const ModernSelect = ({ value, onChange, children }) => (
   <div className="relative">
     <select
@@ -265,10 +267,22 @@ const parsePrice = (str) => {
   return { min: Math.min(...nums), max: Math.max(...nums) };
 };
 
-const formatPrice = (value) =>
-  value >= 1 ? `₹${value.toFixed(2)} Cr` : `₹${(value * 100).toFixed(0)} L`;
+const formatPrice = (value) => {
+    // Formats numbers into ₹XX L or ₹XX.XX Cr strings
+    if (value < 1) {
+        return `₹${(value * 100).toFixed(0)} L`;
+    }
+    return `₹${value.toFixed(2)} Cr`;
+};
+
+
+// --- MAIN COMPONENT ---
 
 export default function AllProperties() {
+  // --- MODIFICATION 1: DEFINE FIXED PRICE RANGE ---
+  const MIN_PRICE = 0.75; // 75 Lakhs
+  const MAX_PRICE = 25;   // 25 Crores
+
   const enriched = useMemo(
     () =>
       properties.map((p) => {
@@ -283,14 +297,14 @@ export default function AllProperties() {
     [enriched]
   );
 
-  const minPriceGlobal = Math.min(...enriched.map((p) => p.priceMin));
-  const maxPriceGlobal = Math.max(...enriched.map((p) => p.priceMax));
-
+  // State variables
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
   const [location, setLocation] = useState('All');
-  const [sort, setSort] = useState('default');
-  const [priceRange, setPriceRange] = useState([minPriceGlobal, maxPriceGlobal]);
+  const [sort] = useState('default');
+  
+  // --- MODIFICATION 2: INITIALIZE STATE WITH FIXED RANGE ---
+  const [priceRange, setPriceRange] = useState([MIN_PRICE, MAX_PRICE]);
   const [rangeOpen, setRangeOpen] = useState(false);
 
   const filtered = useMemo(
@@ -301,7 +315,10 @@ export default function AllProperties() {
           p.title.toLowerCase().includes(term) || p.location.toLowerCase().includes(term);
         const matchesCategory = category === 'All' || p.category === category;
         const matchesLocation = location === 'All' || p.location === location;
+        
+        // Filter logic: property's min price must be within the selected range
         const matchesPrice = p.priceMin >= priceRange[0] && p.priceMin <= priceRange[1];
+        
         return matchesSearch && matchesCategory && matchesLocation && matchesPrice;
       }),
     [enriched, search, category, location, priceRange]
@@ -345,7 +362,7 @@ export default function AllProperties() {
                 ))}
               </ModernSelect>
             </div>
-            <div classnName="space-y-2">
+            <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">Location</label>
               <ModernSelect value={location} onChange={(e) => setLocation(e.target.value)}>
                 <option value="All">All</option>
@@ -379,10 +396,11 @@ export default function AllProperties() {
                       transition={{ duration: 0.2 }}
                       className="absolute top-full left-1/2 -translate-x-1/2 w-64 bg-white p-4 rounded-xl shadow-lg mt-2 z-40"
                     >
+                      {/* --- MODIFICATION 3: SET FIXED MIN/MAX ON SLIDER --- */}
                       <Range
-                        step={0.01}
-                        min={minPriceGlobal}
-                        max={maxPriceGlobal}
+                        step={0.25} // Step by 25 Lakhs
+                        min={MIN_PRICE}
+                        max={MAX_PRICE}
                         values={priceRange}
                         onChange={setPriceRange}
                         renderTrack={({ props, children }) => (
@@ -404,38 +422,37 @@ export default function AllProperties() {
             </div>
           </aside>
 
-          {/* Properties Grid */}
+          {/* Properties Grid (UNCHANGED) */}
           <section className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-  {sorted.map((p, idx) => (
-    <div
-      key={idx}
-      className="bg-white rounded-xl border border-gray-100 shadow hover:shadow-xl transition overflow-hidden flex flex-col h-full"
-    >
-      <img
-   src={p.images && p.images.length ? p.images[0] : "/images/properties/placeholder.jpg"}
-  alt={p.title}
-  className="w-full h-56 object-cover"
-/>
-      <div className="p-5 flex flex-col flex-1">
-        <div className="space-y-1">
-          <h2 className="text-xl font-semibold text-gray-800">{p.title}</h2>
-          <p className="text-sm text-[#1B1B59]">{p.category}</p>
-          <p className="text-gray-500">{p.location}</p>
-        </div>
-
-        <div className="mt-auto flex flex-col items-start">
-          <p className="text-[#1B1B59] font-bold">{p.price}</p>
-          <Link
-  to={`/properties/${p.id}`}
-  className="mt-2 self-start w-fit bg-[#1F275E] text-white text-[12px] font-semibold px-3 py-1 rounded-full shadow hover:bg-[#0f1646] transition duration-300"
->
-  View Details
-</Link>
-        </div>
-      </div>
-    </div>
-  ))}
-</section>
+            {sorted.map((p, idx) => (
+              <div
+                key={idx}
+                className="bg-white rounded-xl border border-gray-100 shadow hover:shadow-xl transition overflow-hidden flex flex-col h-full"
+              >
+                <img
+                  src={p.image && p.image.length ? p.image[0] : "/images/properties/placeholder.jpg"}
+                  alt={p.title}
+                  className="w-full h-56 object-cover"
+                />
+                <div className="p-5 flex flex-col flex-1">
+                  <div className="space-y-1">
+                    <h2 className="text-xl font-semibold text-gray-800">{p.title}</h2>
+                    <p className="text-sm text-[#1B1B59]">{p.category}</p>
+                    <p className="text-gray-500">{p.location}</p>
+                  </div>
+                  <div className="mt-auto flex flex-col items-start">
+                    <p className="text-[#1B1B59] font-bold">{p.price}</p>
+                    <Link
+                      to={`/properties/${p.id}`}
+                      className="mt-2 self-start w-fit bg-[#1F275E] text-white text-[12px] font-semibold px-3 py-1 rounded-full shadow hover:bg-[#0f1646] transition duration-300"
+                    >
+                      View Details
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </section>
         </div>
       </div>
     </div>

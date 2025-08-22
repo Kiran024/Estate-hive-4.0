@@ -588,6 +588,12 @@ const properties = [
   {
     id: 1,
     title: "Konig Villas North County",
+     image: ["/images/properties/Konig Villas North County.jpg"],
+      images: [
+      "/images/properties/Konig 4.jpg",
+      "/images/properties/Konig5.jpg",
+      "/images/properties/Konig 6.jpg"
+    ],
     type: "4 Bhk Villas",
     location: "Devanahalli",
     price: "2.46 - 3.21 Cr",
@@ -599,12 +605,13 @@ const properties = [
     description:
       "Konig Villas North County in Devanahalli offers 4 Bhk Villas with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Konig Villas North County.jpg"],
-    map: { lat: 13.2477, lng: 77.7033 },
+    map: { lat: 13.21653845911568, lng: 77.60484576555487 },
+    
   },
   {
     id: 2,
     title: "Barca At Godrej MSR City",
+     image: ["/images/properties/Barca At Godrej MSR City.jpg"],
     type: "2/3 Bhk Apartment",
     location: "Devanahalli",
     price: "1.3 - 1.89 Cr",
@@ -616,8 +623,7 @@ const properties = [
     description:
       "Barca At Godrej MSR City in Devanahalli offers 2/3 Bhk Apartment with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Barca At Godrej MSR City.jpg"],
-    map: { lat: 13.2477, lng: 77.7033 },
+    map: { lat: 13.194386418736572, lng: 77.66033497734388 },
   },
   {
     id: 3,
@@ -633,8 +639,9 @@ const properties = [
     description:
       "Hybenden Clifton in Devanahalli offers 2/3 Bhk with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Hybenden Clifton.jpg"],
-    map: { lat: 13.2477, lng: 77.7033 },
+    image: ["/images/properties/Hybenden Clifton.jpg"],
+    map: { lat: 13.212407739127583, lng: 77.64916760433078 },
+   
   },
   {
     id: 4,
@@ -650,8 +657,9 @@ const properties = [
     description:
       "Ebony at Brigade Orchards in Devanahalli offers 3/4 Bhk with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Ebony at Brigade Orchards.jpg"],
-    map: { lat: 13.2477, lng: 77.7033 },
+    image: ["/images/properties/Ebony at Brigade Orchards.jpg"],
+    map: { lat: 13.228448370220725, lng:  77.72000930802896 },
+    
   },
   {
     id: 5,
@@ -667,8 +675,9 @@ const properties = [
     description:
       "Provident Deansgate on Devanahall/IVC Road offers 3 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Provident Deansgate.jpg"],
-    map: { lat: 13.263, lng: 77.7035 },
+    image: ["/images/properties/Provident Deansgate.jpg"],
+    map: { lat: 13.263, lng: 77.65261108474027 },
+    
   },
   {
     id: 6,
@@ -684,8 +693,9 @@ const properties = [
     description:
       "Birla Trimaya Phase 3 in Devanahalli offers 2/3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Birla Trimaya Phase 3.jpg"],
-    map: { lat: 13.2477, lng: 77.7033 },
+    image: ["/images/properties/Birla Trimaya Phase 3.jpg"],
+    map: { lat: 13.187830280406367, lng: 77.66803599638392 },
+    
   },
   {
     id: 7,
@@ -701,8 +711,9 @@ const properties = [
     description:
       "Arvind The Park in Devanahalli offers premium plots with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Arvind The Park.jpg"],
-    map: { lat: 13.2477, lng: 77.7033 },
+    image: ["/images/properties/Arvind The Park.jpg"],
+    map: { lat: 13.04682813632676, lng: 77.50232082336846 },
+ 
   },
   {
     id: 8,
@@ -718,8 +729,9 @@ const properties = [
     description:
       "Earthsong by Manyata in Devanahalli offers premium plots with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Earthsong by Manyata.jpg"],
-    map: { lat: 13.2477, lng: 77.7033 },
+    image: ["/images/properties/Earthsong by Manyata.jpg"],
+    map: { lat: 13.224326528459146, lng: 77.64489801782425 },
+    
   },
   {
     id: 9,
@@ -735,8 +747,9 @@ const properties = [
     description:
       "The Secret Lake in Devanahalli offers premium plots with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/The Secret Lake.jpg"],
-    map: { lat: 13.2477, lng: 77.7033 },
+    image: ["/images/properties/The Secret Lake.jpg"],
+    map: { lat: 11.872726612625176, lng: 76.0049628590504 },
+    
   },
   {
     id: 10,
@@ -752,8 +765,9 @@ const properties = [
     description:
       "Vagmine Water Homes in Devanahalli offers 4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Vagmine Water Homes.jpg"],
-    map: { lat: 13.2477, lng: 77.7033 },
+    image: ["/images/properties/Vagmine Water Homes.jpg"],
+    map: { lat: 13.065455009207229, lng: 77.58216293686202 },
+   
   },
   {
     id: 11,
@@ -769,8 +783,9 @@ const properties = [
     description:
       "Brigade Oasis in Devanahalli offers residences with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Brigade Oasis.jpg"],
-    map: { lat: 13.2477, lng: 77.7033 },
+    image: ["/images/properties/Brigade Oasis.jpg"],
+    map: { lat:  13.268470678276843, lng: 77.66831885035847 },
+    
   },
   {
     id: 12,
@@ -786,8 +801,9 @@ const properties = [
     description:
       "Mersuri Antelopes in Devanahalli offers 4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Mersuri Antelopes.jpg"],
-    map: { lat: 13.2477, lng: 77.7033 },
+    image: ["/images/properties/Mersuri Antelopes.jpg"],
+    map: { lat: 13.232321314964066, lng: 77.72301826754912 },
+    
   },
   {
     id: 13,
@@ -799,12 +815,13 @@ const properties = [
     baths: 0,
     parking: 0,
     phone: "",
-    category: "For Rent",
+    category: "For Sale",
     description:
       "Century Trails in Devanahalli offers premium land with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Century Trails.jpg"],
-    map: { lat: 13.2477, lng: 77.7033 },
+    image: ["/images/properties/Century Trails.jpg"],
+    map: { lat: 13.279116784686712, lng: 77.67934535035857 },
+    
   },
   {
     id: 14,
@@ -816,12 +833,13 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "For Rent",
+    category: "For Sale",
     description:
       "Signature One in Devanahalli offers 4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Signature One.jpg"],
-    map: { lat: 13.2477, lng: 77.7033 },
+    image: ["/images/properties/Signature One.jpg"],
+    map: { lat:  13.2348145663254, lng: 77.69669265004234 },
+    
   },
   {
     id: 15,
@@ -833,12 +851,13 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "For Rent",
+    category: "For Sale",
     description:
       "Brigade Atmosphere in Devanahalli offers 3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Brigade Atmosphere.jpg"],
-    map: { lat: 13.2477, lng: 77.7033 },
+    image: ["/images/properties/Brigade Atmosphere.jpg"],
+    map: { lat:  13.267215674440497, lng:77.73877949064115 },
+    
   },
   {
     id: 16,
@@ -850,12 +869,12 @@ const properties = [
     baths: 0,
     parking: 0,
     phone: "",
-    category: "For Rent",
+    category: "For Sale",
     description:
       "Total Environment in Devanahalli offers premium land with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Total Environment.jpg"],
-    map: { lat: 13.2477, lng: 77.7033 },
+    image: ["/images/properties/Total Environment.jpg"],
+    map: { lat: 13.26872703424636, lng:77.6820941198485},
   },
   {
     id: 17,
@@ -867,12 +886,13 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "Aditi 9148032840 / Akhil 8792494788",
-    category: "For Rent",
+    category: "For Sale",
     description:
       "Assetz Zen and Sato in Yelahanka offers 3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Assetz Zen and Sato1.jpg"],
-    map: { lat: 13.0924, lng: 77.5946 },
+    image: ["/images/properties/Assetz Zen and Sato1.jpg"],
+    map: { lat: 13.12268791723491, lng:77.63413595275581 },
+    
   },
   {
     id: 18,
@@ -884,12 +904,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "For Rent",
+    category: "For Sale",
     description:
       "Brigade Eternia in Yelahanka offers 1/3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Brigade Eternia1.jpg"],
-    map: { lat: 13.0924, lng: 77.5946 },
+    image: ["/images/properties/Brigade Eternia1.jpg"],
+    map: { lat:  13.096825931905768, lng: 77.59296410617796 },
   },
   {
     id: 19,
@@ -901,12 +921,13 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "For Rent",
+    category: "For Sale",
     description:
       "Lodha Mirabelle in Hebbal offers 2/3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/LodhaMirabelle1.jpg"],
-    map: { lat: 13.0355, lng: 77.597 },
+    image: ["/images/properties/LodhaMirabelle1.jpg"],
+    map: { lat: 13.050903007279587, lng: 77.62470152246448 },
+   
   },
   {
     id: 20,
@@ -918,12 +939,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "For Rent",
+    category: "For Sale",
     description:
       "SB Urban Park in Thanisandra offers 3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/SB Urban Park.jpg"],
-    map: { lat: 13.0465, lng: 77.6521 },
+    image: ["/images/properties/SB Urban Park.jpg"],
+    map: { lat:  13.05885235514705, lng:77.61975167734171 },
   },
   {
     id: 21,
@@ -935,12 +956,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "For Rent",
+    category: "For Sale",
     description:
       "Sumadhura Epitome in Hebbal offers 2/3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Sumadhura Epitome.jpg"],
-    map: { lat: 13.0355, lng: 77.597 },
+    image: ["/images/properties/Sumadhura Epitome.jpg"],
+    map: { lat:13.06542954932475, lng: 77.62655155590218},
   },
   {
     id: 22,
@@ -952,12 +973,13 @@ const properties = [
     baths: 0,
     parking: 0,
     phone: "",
-    category: "For Rent",
+    category: "For Sale",
     description:
       "Montira by Rare earth in Nandi Hills offers premium land with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Montira by Rare earth.jpg"],
-    map: { lat: 13.3702, lng: 77.6835 },
+    image: ["/images/properties/Montira by Rare earth.jpg"],
+    map: { lat: 12.899294310360697, lng: 77.81075144118465 },
+    
   },
   {
     id: 23,
@@ -969,12 +991,13 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "For Rent",
+    category: "For Sale",
     description:
       "Keya Life by the Lake in Hebbal offers 4/5 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Keya Life by the Lake.jpg"],
-    map: { lat: 13.0355, lng: 77.597 },
+    image: ["/images/properties/Keya Life by the Lake.jpg"],
+    map: { lat: 13.090647487640101, lng:77.60763000192932 },
+  
   },
   {
     id: 24,
@@ -986,12 +1009,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "For Rent",
+    category: "For Sale",
     description:
       "L&T Elara Celestia in Yelahanka offers 3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/L&T Elara Celestia.jpg"],
-    map: { lat: 13.0924, lng: 77.5946 },
+    image: ["/images/properties/L&T Elara Celestia.jpg"],
+    map: { lat: 13.072235655903754, lng: 77.59129338103999 },
   },
   {
     id: 25,
@@ -1003,12 +1026,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "Luxury Rentals",
+    category: "For Sale",
     description:
       "Concorde Mayfair in Yelahanka offers 3 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Concorde Mayfair.jpg"],
-    map: { lat: 13.0924, lng: 77.5946 },
+    image: ["/images/properties/Concorde Mayfair.jpg"],
+    map: { lat: 13.094804383180572, lng: 77.59772339453359 },
   },
   {
     id: 26,
@@ -1020,12 +1043,13 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "Luxury Rentals",
+    category: "For Sale",
     description:
       "Casagrand Promenade in Yelahanka offers 2/3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Casagrand Promenade.jpg"],
-    map: { lat: 13.0924, lng: 77.5946 },
+    image: ["/images/properties/Casagrand Promenade.jpg"],
+    map: { lat: 13.092579685914854, lng: 77.55690934268462 },
+   
   },
   {
     id: 27,
@@ -1037,12 +1061,13 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "Luxury Rentals",
+    category: "For Sale",
     description:
       "Sobha Hamptons in Attibelle offers 3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Sobha Hamptons.jpg"],
-    map: { lat: 12.7809, lng: 77.7672 },
+    image: ["/images/properties/Sobha Hamptons.jpg"],
+    map: { lat:12.793720007552526, lng: 77.74276514479946 },
+   
   },
   {
     id: 28,
@@ -1054,12 +1079,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "Luxury Rentals",
+    category: "For Sale",
     description:
       "Total Environment - In That quiet earth on Hennur Road offers 2/3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Total Environment - In That quiet earth.jpg"],
-    map: { lat: 13.0397, lng: 77.6408 },
+    image: ["/images/properties/Total Environment - In That quiet earth.jpg"],
+    map: { lat:  13.053087755523128, lng: 77.67832766911067},
   },
   {
     id: 29,
@@ -1071,12 +1096,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "Luxury Rentals",
+    category: "For Sale",
     description:
       "Alpine Pyramid in Sahakara Nagar offers 2/3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Alpine Pyramid.jpg"],
-    map: { lat: 13.0472, lng: 77.579 },
+    image: ["/images/properties/Alpine Pyramid.jpg"],
+    map: { lat: 13.066435163671589, lng:77.57722774212357 },
   },
   {
     id: 30,
@@ -1088,12 +1113,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "Luxury Rentals",
+    category: "For Sale",
     description:
       "RG Orchids Gardenia in Hebbal offers 3 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/RG Orchids Gardenia.jpg"],
-    map: { lat: 13.0355, lng: 77.597 },
+    image: ["/images/properties/RG Orchids Gardenia.jpg"],
+    map: { lat: 13.039571978916946, lng:77.61726037095849 },
   },
   {
     id: 31,
@@ -1105,11 +1130,11 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "Luxury Rentals",
+    category: "For Sale",
     description: "L&T Olivia in Hebbal offers 3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/L&T Olivia.jpg"],
-    map: { lat: 13.0355, lng: 77.597 },
+    image: ["/images/properties/L&T Olivia.jpg"],
+    map: { lat: 13.069848315569162, lng: 77.58914788260473 },
   },
   {
     id: 32,
@@ -1121,12 +1146,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "Luxury Rentals",
+    category: "For Sale",
     description:
       "TVS Isle of Trees in Hebbal offers 3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/TVS Isle of Trees.jpg"],
-    map: { lat: 13.0355, lng: 77.597 },
+    image: ["/images/properties/TVS Isle of Trees.jpg"],
+    map: { lat: 13.061528152139227, lng: 77.6223908302145 },
   },
   {
     id: 33,
@@ -1138,12 +1163,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "Luxury Rentals",
+    category: "For Sale",
     description:
       "Sobha HRC Pristine in Jakkur offers 3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Sobha HRC Pristine.jpg"],
-    map: { lat: 13.0881, lng: 77.5978 },
+    image: ["/images/properties/Sobha HRC Pristine.jpg"],
+    map: { lat: 13.068290767445182, lng:77.60630406726297 },
   },
   {
     id: 34,
@@ -1155,12 +1180,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "Luxury Rentals",
+    category: "For Sale",
     description:
       "Ranka Ankura in Thanisandra offers 2/3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Ranka Ankura.jpg"],
-    map: { lat: 13.0465, lng: 77.6521 },
+    image: ["/images/properties/Ranka Ankura.jpg"],
+    map: { lat: 13.098077780953234, lng: 77.63694252678252 },
   },
   {
     id: 35,
@@ -1172,12 +1197,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "Luxury Rentals",
+    category: "For Sale",
     description:
       "Prestige Camden Gardens in Thanisandra offers 3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Prestige Camden Gardens.jpg"],
-    map: { lat: 13.0465, lng: 77.6521 },
+    image: ["/images/properties/Prestige Camden Gardens.jpg"],
+    map: { lat: 13.094183385527337, lng: 77.63715418814944 }
   },
   {
     id: 36,
@@ -1189,12 +1214,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "Luxury Rentals",
+    category: "For Sale",
     description:
       "Vajram Vivera in Thanisandra offers 3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Vajram Vivera.jpg"],
-    map: { lat: 13.0465, lng: 77.6521 },
+    image: ["/images/properties/Vajram Vivera.jpg"],
+    map: { lat: 13.103904381871509, lng:77.6160449654156 },
   },
   {
     id: 37,
@@ -1206,12 +1231,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "EH Signature™",
+    category: "For Sale",
     description:
       "Total Down by the water in Yelahanka offers 3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Total Down by the water.jpg"],
-    map: { lat: 13.0924, lng: 77.5946 },
+    image: ["/images/properties/Total Down by the water.jpg"],
+    map: { lat: 13.093219884771324, lng:  77.61269431144065},
   },
   {
     id: 38,
@@ -1223,12 +1248,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "EH Signature™",
+    category: "For Sale",
     description:
       "Surya Valencia in Yelahanka offers 4/5 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Surya Valencia.jpg"],
-    map: { lat: 13.0924, lng: 77.5946 },
+    image: ["/images/properties/Surya Valencia.jpg"],
+    map: { lat: 13.199111759107963, lng:77.54939329610102},
   },
   {
     id: 39,
@@ -1240,12 +1265,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "EH Signature™",
+    category: "For Sale",
     description:
       "Elegant Takt Tropical Symphony in Yelahanka offers 2/3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Elegant Takt Tropical Symphony.jpg"],
-    map: { lat: 13.0924, lng: 77.5946 },
+    image: ["/images/properties/Elegant Takt Tropical Symphony.jpg"],
+    map: { lat:  13.095193032553663, lng: 77.56169687706104 },
   },
   {
     id: 40,
@@ -1257,12 +1282,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "EH Signature™",
+    category: "For Sale",
     description:
       "Visista By Vista Spaces Okas in Yelahanka offers 2/3 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Visista By Vista Spaces Okas.jpg"],
-    map: { lat: 13.0924, lng: 77.5946 },
+    image: ["/images/properties/Visista By Vista Spaces Okas.jpg"],
+    map: { lat: 13.080904445649258, lng: 77.59179659609865 },
   },
   {
     id: 41,
@@ -1274,12 +1299,13 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "EH Signature™",
+    category: "For Sale",
     description:
       "Assetz Sora and Saki in Bagalur offers 3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Assetz Sora and Saki.jpg"],
-    map: { lat: 13.1336, lng: 77.6715 },
+    image: ["/images/properties/Assetz Sora and Saki.jpg"],
+    map: { lat:13.148067253411417, lng:77.68235430164425 },
+
   },
   {
     id: 42,
@@ -1291,12 +1317,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "EH Signature™",
+    category: "For Sale",
     description:
       "Brigade El Dorado in Bagalur offers 2/3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Brigade El Dorado.jpg"],
-    map: { lat: 13.1336, lng: 77.6715 },
+    image: ["/images/properties/Brigade El Dorado.jpg"],
+    map: { lat:  13.144458678012612, lng: 77.68475832214935 },
   },
   {
     id: 43,
@@ -1308,12 +1334,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "EH Signature™",
+    category: "For Sale",
     description:
       "Godrej Ananda in Bagalur offers 2/3 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Godrej Ananda.jpg"],
-    map: { lat: 13.1336, lng: 77.6715 },
+    image: ["/images/properties/Godrej Ananda.jpg"],
+    map: { lat: 13.147727191646489, lng: 77.67806650589755 },
   },
   {
     id: 44,
@@ -1325,12 +1351,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "EH Signature™",
+    category: "For Sale",
     description:
       "DNR Parklink on Hennur Road offers 2/3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/DNR Parklink.jpg"],
-    map: { lat: 13.0397, lng: 77.6408 },
+    image: ["/images/properties/DNR Parklink.jpg"],
+    map: { lat: 13.080112849176038, lng: 77.65492722863019 },
   },
   {
     id: 45,
@@ -1342,12 +1368,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "EH Signature™",
+    category: "For Sale",
     description:
       "Kolte Patil Lakeside on Hennur Road offers 2/3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Kolte Patil Lakeside.jpg"],
-    map: { lat: 13.0397, lng: 77.6408 },
+    image: ["/images/properties/Kolte Patil Lakeside.jpg"],
+    map: { lat:  13.096931982488355, lng:  77.6481056402762 },
   },
   {
     id: 46,
@@ -1359,12 +1385,12 @@ const properties = [
     baths: 0,
     parking: 0,
     phone: "",
-    category: "EH Signature™",
+    category: "For Sale",
     description:
       "Living Walls Hush Fields on Hennur Road offers premium plots with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Living Walls Hush Fields.jpg"],
-    map: { lat: 13.0397, lng: 77.6408 },
+    image: ["/images/properties/Living Walls Hush Fields.jpg"],
+    map: { lat: 13.075308854268945, lng: 77.65450405376943 },
   },
   {
     id: 47,
@@ -1376,12 +1402,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "EH Signature™",
+    category: "For Sale",
     description:
       "Living Walls True North on Hennur Road offers 3/4 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Living Walls True North.jpg"],
-    map: { lat: 13.0397, lng: 77.6408 },
+    image: ["/images/properties/Living Walls True North.jpg"],
+    map: { lat:  13.07464237535522, lng: 77.65244997706063 },
   },
   {
     id: 48,
@@ -1393,12 +1419,12 @@ const properties = [
     baths: 4,
     parking: 2,
     phone: "",
-    category: "EH Signature™",
+    category: "For Sale",
     description:
       "Mantri Webcity on Hennur Main Road offers 3 BHK with modern amenities.",
     features: ["Gated Community", "Club House", "Security"],
-    images: ["/images/properties/Mantri Webcity.jpg"],
-    map: { lat: 13.0369, lng: 77.65 },
+    image: ["/images/properties/Mantri Webcity.jpg"],
+    map: { lat:13.071815029861721, lng: 77.6462071596943 },
   },
 ];
 

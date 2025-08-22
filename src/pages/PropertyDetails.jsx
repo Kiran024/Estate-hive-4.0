@@ -210,6 +210,7 @@
 
 
 // src/pages/PropertiesDetails.jsx
+// src/pages/PropertyDetails.jsx
 import React, { useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import mapboxgl from "mapbox-gl";
@@ -230,25 +231,63 @@ export default function PropertyDetails() {
 
     const map = new mapboxgl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/mapbox/streets-v11",
+      style: "mapbox://styles/mapbox/streets-v12",
       center: [property.map.lng, property.map.lat],
-      zoom: 15,
+      zoom: 13,
     });
 
-    new mapboxgl.Marker().setLngLat([property.map.lng, property.map.lat]).addTo(map);
+    // --- MODIFICATION START ---
+    map.scrollZoom.disable();
+    map.dragPan.disable();
+    map.dragRotate.disable();
+    map.touchZoomRotate.disable();
+
+    const popupContent = document.createElement("div");
+    popupContent.className = "p-2";
+    const button = document.createElement("button");
+    button.className =
+      "bg-blue-600 text-white text-sm font-semibold px-3 py-1 rounded-md hover:bg-blue-700";
+    button.innerText = "Open in Google Maps";
+    button.onclick = () => {
+      const url = `https://www.google.com/maps?q=${property.map.lat},${property.map.lng}`;
+      window.open(url, "_blank");
+    };
+    popupContent.appendChild(button);
+
+    const popup = new mapboxgl.Popup({ offset: 40 }).setDOMContent(
+      popupContent
+    );
+
+    const markerEl = document.createElement("div");
+    markerEl.innerHTML = `
+      <svg viewBox="0 0 24 24" width="32" height="32" fill="#ff0000" style="cursor: pointer;">
+        <path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7zm0 9.5c-1.4 0-2.5-1.1-2.5-2.5S10.6 6.5 12 6.5s2.5 1.1 2.5 2.5S13.4 11.5 12 11.5z"/>
+      </svg>
+    `;
+
+    new mapboxgl.Marker({ element: markerEl, anchor: "bottom" })
+      .setLngLat([property.map.lng, property.map.lat])
+      .setPopup(popup)
+      .addTo(map);
+    // --- MODIFICATION END ---
+
     return () => map.remove();
   }, [property]);
 
-  if (!property) return <p className="pt-24 text-center">Property not found.</p>;
+  if (!property)
+    return <p className="pt-24 text-center">Property not found.</p>;
 
-  // always show two thumbnails (repeat the first if only one image exists)
-  const thumbs =
-    property.images.length > 1
-      ? property.images.slice(1, 3)
-      : [property.images[0], property.images[0]];
+  // updated image gallery logic
+  const gallery =
+    Array.isArray(property?.image_gallery) && property.image_gallery.length
+      ? property.image_gallery
+      : property.image
+      ? [property.image]
+      : [];
 
-  const handleViewDetails = () =>
-    mapSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+  const mainImage = gallery[0] || "";
+  let thumbs = gallery.slice(1, 3);
+  while (thumbs.length < 2) thumbs.push(mainImage);
 
   return (
     <div className="bg-gray-50 min-h-screen pt-28 pb-10">
@@ -256,39 +295,41 @@ export default function PropertyDetails() {
         {/* Images */}
         <div className="md:w-1/2">
           <img
-            src={property.images[0]}
+            src={mainImage}
             alt={property.title}
             className="w-full h-80 object-cover rounded-xl"
           />
-          <div className="flex gap-4 mt-4">
-            {thumbs.map((img, i) => (
-              <img
-                key={i}
-                src={img}
-                alt={`${property.title}-${i}`}
-                className="w-1/2 h-24 object-cover rounded-lg"
-              />
-            ))}
-          </div>
+          {mainImage && (
+            <div className="flex gap-4 mt-4">
+              {thumbs.map((img, i) => (
+                <img
+                  key={i}
+                  src={img}
+                  alt={`${property.title}-${i + 1}`}
+                  className="w-1/2 h-24 object-cover rounded-lg"
+                />
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Content */}
+        {/* Content (No changes here) */}
         <div className="md:w-1/2 mt-6 md:mt-0 space-y-6">
           <h1 className="text-3xl font-semibold text-gray-800">
             {property.title}
           </h1>
           <p className="text-gray-600">{property.location}</p>
-
           <div className="flex items-center gap-3">
-            <p className="text-2xl font-bold text-gray-900">{property.price}</p>
+            <p className="text-2xl font-bold text-gray-900">
+              {property.price}
+            </p>
             <span className="bg-red-600 text-white text-xs font-medium px-3 py-1 rounded-full">
-              EH&nbsp;Verified&trade;
+              EH Verified™
             </span>
             <span className="bg-green-100 text-green-700 text-sm font-medium px-3 py-1 rounded-full">
               {property.category}
             </span>
           </div>
-
           <div className="flex gap-8 mb-6 text-center">
             <div>
               <p className="text-xl font-semibold">{property.bhk}</p>
@@ -303,7 +344,6 @@ export default function PropertyDetails() {
               <p className="text-gray-500">Prk</p>
             </div>
           </div>
-
           {property.features?.length > 0 && (
             <>
               <h2 className="text-xl font-semibold mb-2">Features</h2>
@@ -319,29 +359,17 @@ export default function PropertyDetails() {
               </ul>
             </>
           )}
-
           <p className="text-gray-700">{property.description}</p>
-
-          {/* footer actions */}
           <div className="mt-8 flex items-center justify-between">
             <Link to="/properties" className="text-[#1F275E] hover:underline">
-              &larr; Back to Listings
+              ← Back to Listings
             </Link>
-            {/* <button
-              onClick={handleViewDetails}
-              className="bg-[#1F275E] text-white font-medium px-5 py-2 rounded-lg shadow hover:bg-[#0f1646]"
-            >
-              View Details
-            </button> */}
           </div>
         </div>
       </div>
 
       {/* Mapbox map */}
-      <div
-        ref={mapSectionRef}
-        className="max-w-5xl mx-auto px-4 mt-12"
-      >
+      <div ref={mapSectionRef} className="max-w-5xl mx-auto px-4 mt-12">
         <h2 className="text-2xl font-semibold mb-4">Location</h2>
         <div
           ref={mapContainer}
