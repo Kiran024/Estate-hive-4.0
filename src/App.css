@@ -1,3 +1,29 @@
+/* Global scroll behavior reset */
+html, body {
+  scroll-behavior: auto !important;
+  overflow-x: hidden;
+}
+
+/* Ensure root elements can be scrolled to top */
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Prevent scroll restoration conflicts */
+* {
+  scroll-behavior: auto;
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;

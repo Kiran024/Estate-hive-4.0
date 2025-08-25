@@ -121,21 +121,24 @@ const userAvatar = storedImage || currentUser?.user_metadata?.avatar_url || '/de
       initial={false}
       animate={{
         y: isOpen ? '0%' : isScrollingDown ? '-100%' : '0%',
-        backgroundColor: isScrolled || isOpen ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
-        boxShadow: isScrolled || isOpen ? '0 4px 12px rgba(0,0,0,0.1)' : 'none',
-        backdropFilter: isScrolled || isOpen ? 'blur(8px)' : 'none',
+        backgroundColor: isScrolled || isOpen ? 'rgba(255, 255, 255, 0.95)' : 'rgba(0, 0, 0, 0)',
+        boxShadow: isScrolled || isOpen ? '0 4px 12px rgba(0,0,0,0.1)' : '0 0 0 rgba(0,0,0,0)',
+        backdropFilter: isScrolled || isOpen ? 'blur(10px)' : 'blur(0px)',
       }}
-      transition={{ duration: 0.3 }}
-      className="fixed top-0 left-0 w-full z-[9999]"
+      transition={{ duration: 0.3, ease: 'easeInOut' }}
+      className="fixed top-0 left-0 w-full z-50"
     >
       <div className="max-w-[1400px] mx-auto px-4 md:px-10 py-3 flex items-center justify-between">
         <div className="cursor-pointer" onClick={() => handleNavigation('/')}> 
           <img src="/EH_Logo.svg" alt="Estate Hive Logo" className="h-12 md:h-16 object-contain" />
         </div>
 
-        <ul className={`hidden md:flex space-x-8 text-lg ${isScrolled ? 'text-gray-800' : 'text-white'}`}>
+        <ul className={`hidden md:flex space-x-8 text-lg`}>
           {menuItems.map((item) => (
-            <li key={item.name} onClick={() => handleNavigation(item.path)} className="text-black">
+            <li key={item.name} onClick={() => handleNavigation(item.path)} 
+                className={`cursor-pointer hover:opacity-70 transition-colors duration-300 ${
+                  isScrolled || isOpen ? 'text-gray-800' : 'text-white'
+                }`}>
               {item.name}
             </li>
           ))}
@@ -167,7 +170,7 @@ const userAvatar = storedImage || currentUser?.user_metadata?.avatar_url || '/de
   </div>
 )}
               {dropdownOpen && (
-  <div className="absolute right-0 mt-3 w-64 bg-white dark:bg-gray-600 rounded-xl shadow-lg p-4 space-y-3 z-50 transition-all">
+  <div className="absolute right-0 mt-3 w-64 bg-white dark:bg-gray-600 rounded-xl shadow-lg p-4 space-y-3 z-[60] transition-all">
   {/* User Info */}
   <div className="flex items-center gap-3 border-b pb-3">
     <img
@@ -229,7 +232,7 @@ const userAvatar = storedImage || currentUser?.user_metadata?.avatar_url || '/de
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed top-0 left-0 w-full h-screen bg-white text-gray-800 z-[9998] pt-28 px-6"
+            className="fixed top-0 left-0 w-full h-screen bg-white text-gray-800 z-[60] pt-28 px-6"
           >
             <motion.ul
               variants={staggerContainerVariants}
