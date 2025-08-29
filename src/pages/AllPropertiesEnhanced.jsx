@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useLayoutEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { propertyService } from '../services/propertyService';
@@ -99,6 +99,17 @@ export default function AllPropertiesEnhanced() {
       isLoading
     });
   }, [stableFilters.page, stableFilters.pageSize, totalCount, totalPages, properties.length, isLoading]);
+
+  // add these
+const [navHeight, setNavHeight] = useState(64);
+
+useLayoutEffect(() => {
+  const read = () =>
+    setNavHeight(document.getElementById('site-nav')?.offsetHeight ?? 64);
+  read();
+  window.addEventListener('resize', read);
+  return () => window.removeEventListener('resize', read);
+}, []);
   
   // Use custom scroll to top hook
   const scrollToTop = useScrollToTop({ behavior: 'instant' });
@@ -169,7 +180,7 @@ export default function AllPropertiesEnhanced() {
         await navigator.share({
           title: property.title,
           text: `Check out this property: ${property.title}`,
-          url: `${window.location.origin}/property/${property.id}`
+ url: `${window.location.origin}/property/${property.id}`
         });
       } catch (error) {
         console.error('Error sharing:', error);
@@ -414,10 +425,10 @@ export default function AllPropertiesEnhanced() {
               <button
                 onClick={() => handleFilterChange('category', 'all')}
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                  filters.category === 'all' 
-                    ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md' 
-                    : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200'
-                }`}
+   filters.category === 'sale'
+     ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md'
+     : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200'
+ }`}
               >
                 All Types
               </button>
@@ -612,15 +623,14 @@ export default function AllPropertiesEnhanced() {
               >
                 Any
               </button>
+
               {[1, 2, 3, 4, 5].map((num) => (
                 <button
                   key={num}
                   onClick={() => handleFilterChange('bedrooms', num.toString())}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                    filters.bedrooms === num.toString() 
-                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md' 
-                      : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200'
-                  }`}
+                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${+   filters.bedrooms === num.toString()
+     ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'     : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200'
+ }`}
                 >
                   {num} {num === 5 ? '+' : ''}
                 </button>
@@ -735,9 +745,12 @@ export default function AllPropertiesEnhanced() {
       </div>
     </div>
   );
+ 
+// Duplicate navHeight state removed; use the original declaration above.
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-28 pb-8 px-4">
+    <div   className="min-h-screen bg-gray-50 pb-8 px-4 -mt-10"
+   style={{ paddingTop: navHeight + 12 }} >
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">

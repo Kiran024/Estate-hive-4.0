@@ -156,7 +156,8 @@ export default function PropertyDetailsEnhanced() {
   const categoryConfig = getCategoryBadgeConfig(property.category);
 
   return (
-    <div className="bg-gray-50 min-h-screen pt-28">
+   <div className="bg-gray-50 min-h-screen"
+      style={{ paddingTop: `calc(var(--nav-height) + -3.5rem)` }}>
       {/* Breadcrumb */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">

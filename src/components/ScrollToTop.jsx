@@ -5,8 +5,8 @@ const ScrollToTop = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    // Scroll to top on route change
-    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    // Scroll to top instantly on route change (avoid triggering navbar scroll logic)
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [pathname]);
 
   return null;

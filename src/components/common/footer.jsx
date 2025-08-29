@@ -35,21 +35,28 @@ const Footer = () => {
           Join thousands of satisfied clients who found their perfect property through our AI-powered platform.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-  {/* Button 1: Get Smart Matched */}
-  <button
-    className="relative flex items-center justify-center overflow-hidden px-8 py-4 rounded-md text-[#475569] font-semibold shadow-md bg-[#F3F4F6] text-lg transition-all duration-300 hover:text-white group"
-  >
-    <span className="absolute h-0 w-0 rounded-full bg-[#040449] duration-500 ease-out group-hover:h-56 group-hover:w-59 z-0" />
-    <span className="relative z-10">Get Smart Matched</span>
-  </button>
+  {/* Button 1: Get Smart Matched (navigates) */}
+<Link
+  to="/smart-match-engine"
+  aria-label="Get Smart Matched"
+  className="relative flex items-center justify-center overflow-hidden px-8 py-4 rounded-md text-[#475569] font-semibold shadow-md bg-[#F3F4F6] text-lg transition-all duration-300 hover:text-white group"
+  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+>
+  <span className="absolute h-0 w-0 rounded-full bg-[#040449] duration-500 ease-out group-hover:h-56 group-hover:w-59 z-0" />
+  <span className="relative z-10">Get Smart Matched</span>
+</Link>
 
-  {/* Button 2: Book Consultation */}
-  <button
-    className="relative flex items-center justify-center overflow-hidden px-8 py-4 rounded-md text-[#475569] font-semibold shadow-md bg-[#F3F4F6] text-lg transition-all duration-300 hover:text-white group"
-  >
-    <span className="absolute h-0 w-0 rounded-full bg-[#E7000B] duration-500 ease-out group-hover:h-56 group-hover:w-58 z-0" />
-    <span className="relative z-10">Book Consultation</span>
-  </button>
+  {/* Button 2: Book Consultation (navigates) */}
+<Link
+  to="/contact-us"
+  aria-label="Book Consultation"
+  className="relative flex items-center justify-center overflow-hidden px-8 py-4 rounded-md text-[#475569] font-semibold shadow-md bg-[#F3F4F6] text-lg transition-all duration-300 hover:text-white group"
+  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+>
+  {/* If you don't have custom w-58 in Tailwind, use w-56 so the ripple works */}
+  <span className="absolute h-0 w-0 rounded-full bg-[#E7000B] duration-500 ease-out group-hover:h-56 group-hover:w-56 z-0" />
+  <span className="relative z-10">Book Consultation</span>
+</Link>
 </div>
       </div>
 
