@@ -3,6 +3,7 @@ import { FiChevronDown } from 'react-icons/fi';
 import { Range } from 'react-range';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useAuth } from "../../contexts/AuthContext";
 
 const BUY_MIN = 0;
 const BUY_MAX = 250000000;
@@ -13,6 +14,7 @@ const locations = ['Bangalore'];
 const propertyTypes = ['Apartment', 'Villa', 'Penthouse', 'Plot', 'Commercial'];
 
 const HeroSection = () => {
+  const { user } = useAuth();
   const [location, setLocation] = useState('');
   const [propertyType, setPropertyType] = useState('');
   const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
@@ -253,8 +255,8 @@ const HeroSection = () => {
            <div className="w-full md:w-auto md:px-4">
   {/* The button is now a Link component that navigates to the "/properties" route */}
   <Link
-    to="/properties" // This should match the route for your AllProperties.jsx page in your App.js or router setup
-    className="bg-[#040449] text-white font-semibold text-sm py-3 px-6 rounded-full shadow hover:opacity-90 transition w-full block text-center" // Added block and text-center for proper styling
+    to={user ? "/properties" : "/auth"}
+    className="bg-[#040449] text-white font-semibold text-sm py-3 px-6 rounded-full shadow hover:opacity-90 transition w-full block text-center"
   >
     Browse Properties
   </Link>

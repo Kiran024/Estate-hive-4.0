@@ -168,7 +168,10 @@ export default function PropertyDetails() {
   const thumbnails = images.slice(1, 4);
 
   return (
-    <div className="bg-gray-50 min-h-screen pt-28 pb-10">
+    <div
+  className="bg-gray-50 min-h-screen"
+  style={{ paddingTop: `calc(var(--nav-height) + 0.25rem)` }}
+>
       <div className="max-w-6xl mx-auto px-4">
         {/* Property Header */}
         <div className="mb-6">
