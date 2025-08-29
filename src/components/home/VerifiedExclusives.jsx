@@ -4,6 +4,8 @@ import PropertyListing from '../PropertyListing';
 import { Link } from 'react-router-dom';
 import { propertyService } from '../../services/propertyService';
 import { supabase } from '../../util/supabaseClient';
+import { useAuth } from '../../contexts/AuthContext';
+import AuthModal from '../auth/AuthModal';
 
 const features = [
   {
@@ -61,6 +63,9 @@ const cardVariants = {
 const VerifiedExclusives = () => {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState('signin');
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchVerifiedProperties();
@@ -126,6 +131,15 @@ const VerifiedExclusives = () => {
       setListings(getFallbackListings());
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePropertyClick = (index, e) => {
+    // For non-authenticated users, show login modal after 6 properties
+    if (!user && index >= 6) {
+      e.preventDefault();
+      setShowAuthModal(true);
+      setAuthModalMode('signin');
     }
   };
 
@@ -268,7 +282,57 @@ const VerifiedExclusives = () => {
         </div>
       ) : (
         <>
-          <PropertyListing listings={listings} />
+          <PropertyListing 
+          listings={user ? listings : listings.slice(0, 6)} 
+          onPropertyClick={handlePropertyClick}
+          showLoginPrompt={!user && listings.length > 6}
+        />
+        
+        {/* Show "View More" login prompt for non-authenticated users */}
+        {!user && listings.length > 6 && (
+          <Motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="mt-12 text-center"
+          >
+            <div className="inline-block bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-8 border border-indigo-100">
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                Unlock {listings.length - 6} More Premium Properties
+              </h3>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                Create a free account to access our complete collection of verified exclusive properties
+              </p>
+              <div className="flex gap-4 justify-center">
+                <button
+                  onClick={() => {
+                    setAuthModalMode('signin');
+                    setShowAuthModal(true);
+                  }}
+                  className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => {
+                    setAuthModalMode('signup');
+                    setShowAuthModal(true);
+                  }}
+                  className="px-6 py-3 bg-white border-2 border-gray-200 text-gray-800 font-semibold rounded-lg hover:border-gray-300 transition-all duration-300"
+                >
+                  Create Account
+                </button>
+              </div>
+            </div>
+          </Motion.div>
+        )}
+        
+        {/* Auth Modal */}
+        <AuthModal 
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          initialMode={authModalMode}
+        />
           
           {/* Show total count */}
           {listings.length > 0 && (

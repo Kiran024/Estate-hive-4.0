@@ -10,8 +10,11 @@ import {
   Loader2, AlertCircle, SlidersHorizontal, Building2, MapPinIcon,
   DollarSign, BedDouble, Sofa, Sparkles, TrendingUp
 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import LoginPromptOverlay from '../components/auth/LoginPromptOverlay';
 
 export default function AllPropertiesEnhanced() {
+  const { user } = useAuth();
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const [locationInput, setLocationInput] = useState('');
@@ -747,6 +750,36 @@ useLayoutEffect(() => {
   );
  
 // Duplicate navHeight state removed; use the original declaration above.
+
+  // Wrap the entire component with LoginPromptOverlay if user is not authenticated
+  if (!user) {
+    return (
+      <LoginPromptOverlay 
+        showOverlay={true}
+        title="Unlock Premium Properties"
+        subtitle="Sign in to browse our exclusive collection of verified properties"
+      >
+        <div className="min-h-screen bg-gray-50">
+          {/* Show a blurred version of the page */}
+          <div className="container mx-auto px-4 py-8">
+            <div className="h-20 bg-gray-200 rounded-lg mb-6 animate-pulse"></div>
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              <div className="lg:col-span-1">
+                <div className="h-96 bg-gray-200 rounded-lg animate-pulse"></div>
+              </div>
+              <div className="lg:col-span-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {[1,2,3,4,5,6].map(i => (
+                    <div key={i} className="h-64 bg-gray-200 rounded-lg animate-pulse"></div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </LoginPromptOverlay>
+    );
+  }
 
   return (
     <div   className="min-h-screen bg-gray-50 pb-8 px-4 -mt-10"

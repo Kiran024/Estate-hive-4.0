@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       const data = await authService.signIn(email, password);
       setUser(data.user);
-      navigate('/');
+      // Don't navigate here - let the component handle it
       return { data, error: null };
     } catch (error) {
       setError(error.message);

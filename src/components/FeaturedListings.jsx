@@ -6,6 +6,8 @@ import { propertyService } from "../services/propertyService";
 import { supabase } from "../util/supabaseClient";
 import { Loader2 } from "lucide-react";
 import { formatPrice } from "../types/property.types";
+import { useAuth } from "../contexts/AuthContext";
+import PropertyCardPlaceholder from "./auth/PropertyCardPlaceholder";
 
 const tabs = ["For Sale", "For Rent", "Luxury Rentals", "EH Signature™"];
 
@@ -14,6 +16,7 @@ export default function FeaturedListings() {
   const [direction, setDirection] = useState(1);
   const [properties, setProperties] = useState({});
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchProperties();
@@ -140,7 +143,21 @@ export default function FeaturedListings() {
             className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"
           >
             {properties[activeTab]?.length > 0 ? (
-              properties[activeTab].map((property) => (
+              properties[activeTab].map((property, index) => {
+                // For non-authenticated users, show login prompts for restricted categories
+                if (!user) {
+                  // For "For Sale" category, show first 6 properties only
+                  if (activeTab === "For Sale") {
+                    if (index >= 6) {
+                      return <PropertyCardPlaceholder key={`placeholder-${index}`} index={index} />;
+                    }
+                  } else {
+                    // For other categories, show all as placeholders
+                    return <PropertyCardPlaceholder key={`placeholder-${index}`} index={index} />;
+                  }
+                }
+                
+                return (
                 <Link to={`/property/${property.id}`} key={property.id}>
                   <motion.div
                     className="bg-white p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-all relative group cursor-pointer h-full"
@@ -166,7 +183,8 @@ export default function FeaturedListings() {
                     </div>
                   </motion.div>
                 </Link>
-              ))
+              );
+              })
             ) : (
               <div className="col-span-3 text-center py-10">
                 <p className="text-gray-500">No properties available in this category</p>

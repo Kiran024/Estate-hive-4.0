@@ -11,12 +11,15 @@ import {
 } from 'lucide-react';
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { useAuth } from '../contexts/AuthContext';
+import LoginPromptOverlay from '../components/auth/LoginPromptOverlay';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
 
 export default function PropertyDetailsEnhanced() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [isFavorite, setIsFavorite] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showImageModal, setShowImageModal] = useState(false);
@@ -128,6 +131,45 @@ export default function PropertyDetailsEnhanced() {
           <p className="text-gray-600">Loading property details...</p>
         </div>
       </div>
+    );
+  }
+
+  // If user is not authenticated, show login overlay
+  if (!user) {
+    return (
+      <LoginPromptOverlay 
+        showOverlay={true}
+        title="Sign In to View Property Details"
+        subtitle="Get access to complete property information, photos, and direct owner contact"
+      >
+        <div className="min-h-screen bg-gray-50">
+          {/* Show blurred property preview */}
+          <div className="container mx-auto px-4 py-8">
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+              {/* Blurred header image */}
+              <div className="h-96 bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse"></div>
+              
+              {/* Blurred content sections */}
+              <div className="p-8 space-y-6">
+                <div className="h-8 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+                <div className="h-4 bg-gray-100 rounded w-1/2 animate-pulse"></div>
+                
+                <div className="grid grid-cols-3 gap-4 mt-6">
+                  <div className="h-20 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-20 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-20 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+                
+                <div className="space-y-3 mt-8">
+                  <div className="h-4 bg-gray-100 rounded animate-pulse"></div>
+                  <div className="h-4 bg-gray-100 rounded animate-pulse"></div>
+                  <div className="h-4 bg-gray-100 rounded w-5/6 animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </LoginPromptOverlay>
     );
   }
 

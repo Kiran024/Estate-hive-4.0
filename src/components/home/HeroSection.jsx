@@ -25,8 +25,17 @@ const HeroSection = () => {
   const [maxPrice, setMaxPrice] = useState(BUY_MAX);
   const [priceRange, setPriceRange] = useState([BUY_MIN, BUY_MAX]);
   const [scrollY, setScrollY] = useState(0);
+  
+  // Detect Safari/iOS for background-attachment compatibility
+  const [isSafari, setIsSafari] = useState(false);
 
   useEffect(() => {
+    // Detect Safari/iOS browsers
+    const userAgent = window.navigator.userAgent;
+    const isIOSDevice = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+    const isSafariBrowser = /^((?!chrome|android).)*safari/i.test(userAgent);
+    setIsSafari(isIOSDevice || isSafariBrowser);
+    
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -60,9 +69,9 @@ const HeroSection = () => {
       className="scroll-smooth relative w-full min-h-[120vh] md:h-[150vh] bg-no-repeat bg-cover bg-center text-white overflow-hidden flex items-center justify-center"
       style={{
         backgroundImage: "url('/bg-Early-mrng.jpg')",
-        backgroundAttachment: 'fixed',
+        backgroundAttachment: isSafari ? 'scroll' : 'fixed',
         backgroundSize: 'cover',
-        backgroundPosition: parallaxBackgroundPosition,
+        backgroundPosition: isSafari ? 'center center' : parallaxBackgroundPosition,
       }}
     >
       <div className="absolute inset-0 bg-black/20 z-0" />
