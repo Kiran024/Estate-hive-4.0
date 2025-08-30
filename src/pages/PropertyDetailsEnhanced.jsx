@@ -13,6 +13,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useAuth } from '../contexts/AuthContext';
 import LoginPromptOverlay from '../components/auth/LoginPromptOverlay';
+import WishlistButton from '../components/common/WishlistButton';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
 
@@ -90,10 +91,7 @@ export default function PropertyDetailsEnhanced() {
     }
   }, [property]);
 
-  const handleFavorite = async () => {
-    setIsFavorite(!isFavorite);
-    // TODO: Implement favorite functionality
-  };
+  // Removed handleFavorite - now handled by WishlistButton
 
   const handleShare = () => {
     if (navigator.share) {
@@ -251,13 +249,31 @@ export default function PropertyDetailsEnhanced() {
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
             <div className="flex-1">
-              <div className="flex items-center gap-3 mb-3">
+              <div className="flex items-center gap-3 mb-3 flex-wrap">
                 <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusConfig.className}`}>
                   {statusConfig.label}
                 </span>
                 <span className={`px-3 py-1 rounded-full text-xs font-semibold ${categoryConfig.className}`}>
                   {categoryConfig.label}
                 </span>
+                
+                {/* EH Category Badge */}
+                {property.subcategory && (
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-lg ${
+                    property.subcategory === 'eh_commercial' ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white' :
+                    property.subcategory === 'eh_verified' ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' :
+                    property.subcategory === 'eh_signature' ? 'bg-gradient-to-r from-amber-500 to-yellow-600 text-white' :
+                    property.subcategory === 'eh_dubai' ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white' :
+                    'bg-gray-100 text-gray-700'
+                  }`}>
+                    {property.subcategory === 'eh_commercial' ? '🏢 EH Commercial' :
+                     property.subcategory === 'eh_verified' ? '✓ EH Verified' :
+                     property.subcategory === 'eh_signature' ? '⭐ EH Signature™' :
+                     property.subcategory === 'eh_dubai' ? '🌍 EH Dubai' :
+                     property.subcategory}
+                  </span>
+                )}
+                
                 {property.is_verified && (
                   <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold flex items-center gap-1">
                     <CheckCircle className="w-3 h-3" /> Verified
@@ -288,12 +304,11 @@ export default function PropertyDetailsEnhanced() {
             </div>
             
             <div className="flex items-center gap-3">
-              <button
-                onClick={handleFavorite}
-                className="p-3 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
-              >
-                <Heart className={`w-5 h-5 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
-              </button>
+              <WishlistButton 
+                propertyId={parseInt(id)} 
+                variant="default"
+                size="lg"
+              />
               <button
                 onClick={handleShare}
                 className="p-3 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"

@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion as Motion } from 'framer-motion';
 import PropertyListing from '../PropertyListing';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { propertyService } from '../../services/propertyService';
 import { supabase } from '../../util/supabaseClient';
 import { useAuth } from '../../contexts/AuthContext';
-import AuthModal from '../auth/AuthModal';
 
 const features = [
   {
@@ -63,8 +62,8 @@ const cardVariants = {
 const VerifiedExclusives = () => {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authModalMode, setAuthModalMode] = useState('signin');
+  const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
 
   useEffect(() => {
@@ -112,10 +111,11 @@ const VerifiedExclusives = () => {
         price: property.price || property.rent_amount ? 
           formatPropertyPrice(property.price || property.rent_amount) : 
           'Price on Request',
-        category: mapCategory(property.category),
+        category: mapCategory(property.category, property.subcategory),
+        subcategory: property.subcategory,
         bhk: property.property_subtype || property.bedrooms ? `${property.bedrooms || ''} BHK` : property.property_type,
         area: property.area_sqft ? `${property.area_sqft} sqft` : '',
-        badge: mapCategory(property.category),
+        badge: mapCategory(property.category, property.subcategory),
         image: property.image_urls?.[0] || property.featured_image || '/h01@300x-100.jpg',
         propertyType: property.property_type,
         bedrooms: property.bedrooms,
@@ -138,8 +138,13 @@ const VerifiedExclusives = () => {
     // For non-authenticated users, show login modal after 6 properties
     if (!user && index >= 6) {
       e.preventDefault();
-      setShowAuthModal(true);
-      setAuthModalMode('signin');
+      navigate('/auth', { state: { from: '/properties' } });
+    } else {
+      // For authenticated users or first 6 properties, navigate to property details
+      const propertyId = listings[index]?.id;
+      if (propertyId) {
+        navigate(`/properties/${propertyId}`);
+      }
     }
   };
 
@@ -158,12 +163,19 @@ const VerifiedExclusives = () => {
   };
 
   // Map database category to display category
-  const mapCategory = (category) => {
+  const mapCategory = (category, subcategory) => {
+    // Priority to subcategory for EH categories
+    if (subcategory === 'eh_commercial') return 'EH Commercial';
+    if (subcategory === 'eh_verified') return 'EH Verified';
+    if (subcategory === 'eh_signature') return 'EH Signature™';
+    if (subcategory === 'eh_dubai') return 'EH Dubai';
+    
+    // Standard category mapping
     const categoryMap = {
       'sale': 'For Sale',
       'rent': 'For Rent',
       'lease': 'Luxury Rentals',
-      'rent_to_own': 'EH Signature™'
+      'rent_to_own': 'EH Signature™' // fallback for old data
     };
     return categoryMap[category] || 'For Sale';
   };
@@ -306,8 +318,7 @@ const VerifiedExclusives = () => {
               <div className="flex gap-4 justify-center">
                 <button
                   onClick={() => {
-                    setAuthModalMode('signin');
-                    setShowAuthModal(true);
+                    navigate('/auth', { state: { from: location.pathname, mode: 'signin' } });
                   }}
                   className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
                 >
@@ -315,8 +326,7 @@ const VerifiedExclusives = () => {
                 </button>
                 <button
                   onClick={() => {
-                    setAuthModalMode('signup');
-                    setShowAuthModal(true);
+                    navigate('/auth', { state: { from: location.pathname, mode: 'signup' } });
                   }}
                   className="px-6 py-3 bg-white border-2 border-gray-200 text-gray-800 font-semibold rounded-lg hover:border-gray-300 transition-all duration-300"
                 >
@@ -327,12 +337,6 @@ const VerifiedExclusives = () => {
           </Motion.div>
         )}
         
-        {/* Auth Modal */}
-        <AuthModal 
-          isOpen={showAuthModal}
-          onClose={() => setShowAuthModal(false)}
-          initialMode={authModalMode}
-        />
           
           {/* Show total count */}
           {listings.length > 0 && (

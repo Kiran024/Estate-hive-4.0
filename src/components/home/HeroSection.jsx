@@ -2,19 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { FiChevronDown } from 'react-icons/fi';
 import { Range } from 'react-range';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from "../../contexts/AuthContext";
+import { propertyService } from '../../services/propertyService';
 
 const BUY_MIN = 0;
 const BUY_MAX = 250000000;
 const RENT_LEASE_MIN = 0;
 const RENT_LEASE_MAX = 1000000;
 
-const locations = ['Bangalore'];
-const propertyTypes = ['Apartment', 'Villa', 'Penthouse', 'Plot', 'Commercial'];
-
 const HeroSection = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [location, setLocation] = useState('');
   const [propertyType, setPropertyType] = useState('');
   const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
@@ -25,6 +24,10 @@ const HeroSection = () => {
   const [maxPrice, setMaxPrice] = useState(BUY_MAX);
   const [priceRange, setPriceRange] = useState([BUY_MIN, BUY_MAX]);
   const [scrollY, setScrollY] = useState(0);
+  
+  // Dynamic data from database
+  const [locations, setLocations] = useState(['Bengaluru', 'Bangalore']); // Fallback data
+  const [propertyTypes, setPropertyTypes] = useState(['Apartment', 'Villa', 'Penthouse', 'Plot', 'Commercial']); // Fallback data
   
   // Detect Safari/iOS for background-attachment compatibility
   const [isSafari, setIsSafari] = useState(false);
@@ -41,6 +44,30 @@ const HeroSection = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Fetch dynamic data from database
+  useEffect(() => {
+    const fetchDynamicData = async () => {
+      try {
+        // Fetch unique cities
+        const citiesResponse = await propertyService.getUniqueCities();
+        if (citiesResponse.data && citiesResponse.data.length > 0) {
+          setLocations(citiesResponse.data);
+        }
+
+        // Fetch unique property types
+        const typesResponse = await propertyService.getUniquePropertyTypes();
+        if (typesResponse.data && typesResponse.data.length > 0) {
+          setPropertyTypes(typesResponse.data);
+        }
+      } catch (error) {
+        console.error('Error fetching dynamic data:', error);
+        // Keep fallback data if fetch fails
+      }
+    };
+
+    fetchDynamicData();
+  }, []);
+
   useEffect(() => {
     if (activeTab === 'Buy') {
       setMinPrice(BUY_MIN);
@@ -52,6 +79,47 @@ const HeroSection = () => {
       setPriceRange([0, RENT_LEASE_MAX]);
     }
   }, [activeTab]);
+
+  // Handle search functionality
+  const handleSearch = () => {
+    if (!user) {
+      navigate('/auth', { state: { from: '/properties' } });
+      return;
+    }
+
+    // Create search parameters
+    const searchParams = new URLSearchParams();
+    
+    if (location) {
+      searchParams.set('city', location);
+    }
+    
+    if (propertyType) {
+      searchParams.set('property_type', propertyType);
+    }
+    
+    // Set category based on active tab
+    const categoryMap = {
+      'Buy': 'sale',
+      'Rent': 'rent', 
+      'Lease': 'lease'
+    };
+    if (categoryMap[activeTab]) {
+      searchParams.set('category', categoryMap[activeTab]);
+    }
+    
+    // Add price range (only if not default values)
+    if (priceRange[0] > minPrice) {
+      searchParams.set('min_price', priceRange[0].toString());
+    }
+    if (priceRange[1] < maxPrice) {
+      searchParams.set('max_price', priceRange[1].toString());
+    }
+
+    // Navigate to properties page with search parameters
+    const queryString = searchParams.toString();
+    navigate(queryString ? `/properties?${queryString}` : '/properties');
+  };
 
   const fadeInVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -146,7 +214,7 @@ const HeroSection = () => {
                   setRangeOpen(false);
                 }}
               >
-                <span>{location || 'Select your city'}</span>
+                <span>{location || 'Bengaluru/Bangalore'}</span>
                 <FiChevronDown size={18} className="text-gray-600" />
               </div>
               <AnimatePresence>
@@ -262,13 +330,12 @@ const HeroSection = () => {
             </div>
 
            <div className="w-full md:w-auto md:px-4">
-  {/* The button is now a Link component that navigates to the "/properties" route */}
-  <Link
-    to={user ? "/properties" : "/auth"}
+  <button
+    onClick={handleSearch}
     className="bg-[#040449] text-white font-semibold text-sm py-3 px-6 rounded-full shadow hover:opacity-90 transition w-full block text-center"
   >
-    Browse Properties
-  </Link>
+    Search Properties
+  </button>
 </div>
           </div>
         </Motion.div>

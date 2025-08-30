@@ -354,7 +354,7 @@ export default function PropertyDetails() {
               </div>
 
               {/* Property Status */}
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-2 mb-4 flex-wrap">
                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                   property.status === 'active' ? 'bg-green-100 text-green-700' :
                   property.status === 'sold' ? 'bg-red-100 text-red-700' :
@@ -365,6 +365,24 @@ export default function PropertyDetails() {
                 <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
                   {property.category?.toUpperCase() || 'SALE'}
                 </span>
+                
+                {/* EH Category Badge */}
+                {property.subcategory && (
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-lg ${
+                    property.subcategory === 'eh_commercial' ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white' :
+                    property.subcategory === 'eh_verified' ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' :
+                    property.subcategory === 'eh_signature' ? 'bg-gradient-to-r from-amber-500 to-yellow-600 text-white' :
+                    property.subcategory === 'eh_dubai' ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white' :
+                    'bg-gray-100 text-gray-700'
+                  }`}>
+                    {property.subcategory === 'eh_commercial' ? 'EH COMMERCIAL' :
+                     property.subcategory === 'eh_verified' ? 'EH VERIFIED' :
+                     property.subcategory === 'eh_signature' ? 'EH SIGNATURE™' :
+                     property.subcategory === 'eh_dubai' ? 'EH DUBAI' :
+                     property.subcategory?.toUpperCase()}
+                  </span>
+                )}
+                
                 {property.is_verified && (
                   <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
                     VERIFIED

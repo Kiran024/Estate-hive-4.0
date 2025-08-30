@@ -26,6 +26,19 @@ export const authService = {
     return data;
   },
 
+  // Sign in with OAuth providers (Google, LinkedIn)
+  async signInWithProvider(provider) {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: provider,
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`
+      }
+    });
+    
+    if (error) throw error;
+    return data;
+  },
+
   // Sign out
   async signOut() {
     const { error } = await supabase.auth.signOut();
@@ -77,5 +90,12 @@ export const authService = {
   // Subscribe to auth changes
   onAuthStateChange(callback) {
     return supabase.auth.onAuthStateChange(callback);
+  },
+
+  // Handle OAuth callback
+  async handleOAuthCallback() {
+    const { data, error } = await supabase.auth.getSession();
+    if (error) throw error;
+    return data;
   }
 };

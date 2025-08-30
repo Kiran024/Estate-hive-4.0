@@ -203,17 +203,15 @@
 
 
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { createClient } from '@supabase/supabase-js';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { supabase } from '../util/supabaseClient';
+import { authService } from '../services/authService';
 import logo from '../assets/logo01.svg';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const supabaseUrl =  'https://qfmglenbyvhfrydozzqp.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmbWdsZW5ieXZoZnJ5ZG96enFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI3Nzc1MTksImV4cCI6MjA2ODM1MzUxOX0.KgiS9wmPVCnGCxYxLE2wSKRgwYwXvLU-j8UtIpmDUfQ';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
 const AuthPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isFlipped, setIsFlipped] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -226,11 +224,35 @@ const [showTermsToast, setShowTermsToast] = useState(false);
 
 
   useEffect(() => {
+    // Check for error from navigation state
+    if (location.state?.error) {
+      setMessage(location.state.error);
+      setSuccess(false);
+    }
+
+    // Store redirect path if provided
+    if (location.state?.from) {
+      localStorage.setItem('authRedirectTo', location.state.from);
+    }
+
+    // Handle OAuth callback
+    if (window.location.hash && window.location.hash.includes('access_token')) {
+      authService.handleOAuthCallback().then(() => {
+        const from = localStorage.getItem('authRedirectTo') || location.state?.from || '/';
+        localStorage.removeItem('authRedirectTo');
+        navigate(from);
+      });
+    }
+
     const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) navigate('/');
+      if (event === 'SIGNED_IN' && session?.user) {
+        const from = localStorage.getItem('authRedirectTo') || location.state?.from || '/';
+        localStorage.removeItem('authRedirectTo');
+        navigate(from);
+      }
     });
     return () => listener.subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, location]);
 
   const handleSignIn = async () => {
     setLoading(true);
@@ -282,19 +304,21 @@ const [showTermsToast, setShowTermsToast] = useState(false);
   };
 
   const handleGoogleSignIn = async () => {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: `${window.location.origin}/auth/callback`, // optional redirect
-      queryParams: {
-        access_type: 'offline',
-        prompt: 'consent',
-      },
-    },
-  });
-  if (error) alert(error.message);
-};
+    try {
+      await authService.signInWithProvider('google');
+    } catch (error) {
+      setMessage(error.message);
+    }
+  };
   const handleLinkedInSignIn = async () => {
+    try {
+      await authService.signInWithProvider('linkedin_oidc');
+    } catch (error) {
+      setMessage(error.message);
+    }
+  };
+
+  const handleLinkedInSignIn_OLD = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'linkedin_oidc',
       options: { redirectTo: window.location.origin },

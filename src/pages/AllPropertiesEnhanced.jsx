@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useLayoutEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { propertyService } from '../services/propertyService';
 import { formatPrice, PropertyType, PropertyStatus, PropertyCategory, FurnishingStatus } from '../types/property.types';
@@ -8,20 +8,28 @@ import {
   Search, Filter, X, ChevronDown, ChevronUp, MapPin, Bed, Bath, 
   Car, Home, Heart, Share2, Square, IndianRupee, Camera,
   Loader2, AlertCircle, SlidersHorizontal, Building2, MapPinIcon,
-  DollarSign, BedDouble, Sofa, Sparkles, TrendingUp
+  DollarSign, BedDouble, Sofa, Sparkles, TrendingUp, CheckCircle, Star
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import LoginPromptOverlay from '../components/auth/LoginPromptOverlay';
+import WishlistButton from '../components/common/WishlistButton';
 
 export default function AllPropertiesEnhanced() {
   const { user } = useAuth();
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  
+  // Dynamic location data
+  const [availableLocations, setAvailableLocations] = useState(['Bengaluru', 'Bangalore']);
+  const [availablePropertyTypes, setAvailablePropertyTypes] = useState(['Apartment', 'Villa', 'Penthouse']);
   const [searchInput, setSearchInput] = useState('');
   const [locationInput, setLocationInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [debouncedLocation, setDebouncedLocation] = useState('');
   const [expandedSections, setExpandedSections] = useState({
     category: true,
+    ehCategory: false,
     propertyType: true,
     price: true,
     bedrooms: true,
@@ -35,6 +43,7 @@ export default function AllPropertiesEnhanced() {
     status: 'active',
     property_type: 'all',
     category: 'all',
+    subcategory: 'all',
     city: '',
     min_price: '',
     max_price: '',
@@ -63,6 +72,72 @@ export default function AllPropertiesEnhanced() {
     return () => clearTimeout(timer);
   }, [locationInput]);
 
+  // Handle URL search parameters on component mount
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    
+    // Update filters with URL parameters
+    setFilters(prevFilters => {
+      const newFilters = { ...prevFilters };
+      let hasChanges = false;
+    
+    if (params.get('city')) {
+      newFilters.city = params.get('city');
+      setLocationInput(params.get('city'));
+      hasChanges = true;
+    }
+    
+    if (params.get('property_type')) {
+      newFilters.property_type = params.get('property_type');
+      hasChanges = true;
+    }
+    
+    if (params.get('category')) {
+      newFilters.category = params.get('category');
+      hasChanges = true;
+    }
+    
+    if (params.get('min_price')) {
+      newFilters.min_price = params.get('min_price');
+      hasChanges = true;
+    }
+    
+    if (params.get('max_price')) {
+      newFilters.max_price = params.get('max_price');
+      hasChanges = true;
+    }
+    
+      if (hasChanges) {
+        return newFilters;
+      }
+      return prevFilters;
+    });
+  }, [location.search]); // Only run when URL search params change
+
+  // Fetch dynamic location and property type data
+  useEffect(() => {
+    const fetchDynamicData = async () => {
+      try {
+        // Fetch unique cities
+        const citiesResponse = await propertyService.getUniqueCities();
+        if (citiesResponse.data && citiesResponse.data.length > 0) {
+          setAvailableLocations(citiesResponse.data);
+        }
+
+        // Fetch unique property types
+        const typesResponse = await propertyService.getUniquePropertyTypes();
+        if (typesResponse.data && typesResponse.data.length > 0) {
+          setAvailablePropertyTypes(typesResponse.data);
+        }
+      } catch (error) {
+        console.error('Error fetching dynamic data:', error);
+        // Keep fallback data if fetch fails
+      }
+    };
+
+    fetchDynamicData();
+  }, []); // Only run once on mount
+
   // Note: We now use stableFilters instead of updating filters state directly
   // This prevents unnecessary re-renders and query refetches
 
@@ -72,7 +147,7 @@ export default function AllPropertiesEnhanced() {
     search: debouncedSearch,
     city: debouncedLocation
   }), [
-    filters.status, filters.property_type, filters.category, 
+    filters.status, filters.property_type, filters.category, filters.subcategory,
     filters.min_price, filters.max_price, filters.bedrooms, 
     filters.bathrooms, filters.furnishing_status, filters.sortBy, 
     filters.sortOrder, filters.page, filters.pageSize,
@@ -170,11 +245,7 @@ useLayoutEffect(() => {
     }));
   };
 
-  // Handle favorites
-  const handleFavorite = async (propertyId) => {
-    // Implement favorite functionality
-    console.log('Toggle favorite for property:', propertyId);
-  };
+  // Favorites are now handled by WishlistButton component
 
   // Handle share
   const handleShare = async (property) => {
@@ -223,7 +294,7 @@ useLayoutEffect(() => {
         </div>
         
         {/* Category Badge */}
-        <div className="absolute top-3 right-3">
+        <div className="absolute top-3 right-3 flex flex-col gap-2 items-end">
           <span className={`px-2 py-1 rounded text-xs font-semibold ${
             property.category === 'sale' ? 'bg-blue-100 text-blue-700' :
             property.category === 'rent' ? 'bg-purple-100 text-purple-700' :
@@ -232,6 +303,23 @@ useLayoutEffect(() => {
           }`}>
             For {property.category?.charAt(0).toUpperCase() + property.category?.slice(1)}
           </span>
+          
+          {/* EH Category Badge */}
+          {property.subcategory && (
+            <span className={`px-2 py-1 rounded text-xs font-bold shadow-lg ${
+              property.subcategory === 'eh_commercial' ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white' :
+              property.subcategory === 'eh_verified' ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' :
+              property.subcategory === 'eh_signature' ? 'bg-gradient-to-r from-amber-500 to-yellow-600 text-white' :
+              property.subcategory === 'eh_dubai' ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white' :
+              'bg-gray-100 text-gray-700'
+            }`}>
+              {property.subcategory === 'eh_commercial' ? 'EH Commercial' :
+               property.subcategory === 'eh_verified' ? 'EH Verified' :
+               property.subcategory === 'eh_signature' ? 'EH Signature™' :
+               property.subcategory === 'eh_dubai' ? 'EH Dubai' :
+               property.subcategory}
+            </span>
+          )}
         </div>
         
         {/* Image Count */}
@@ -243,16 +331,12 @@ useLayoutEffect(() => {
         )}
         
         {/* Actions */}
-        <div className="absolute bottom-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              handleFavorite(property.id);
-            }}
-            className="bg-white/90 hover:bg-white p-2 rounded-full transition-colors"
-          >
-            <Heart className="w-4 h-4 text-gray-700 hover:text-red-500" />
-          </button>
+        <div className="absolute bottom-3 right-3 flex gap-2">
+          <WishlistButton 
+            propertyId={property.id} 
+            variant="floating"
+            size="sm"
+          />
           <button
             onClick={(e) => {
               e.preventDefault();
@@ -469,6 +553,90 @@ useLayoutEffect(() => {
           )}
         </div>
 
+        {/* EH Category Card */}
+        <div className="bg-white rounded-xl shadow-md p-5 border border-gray-100">
+          <button
+            onClick={() => toggleSection('ehCategory')}
+            className="flex items-center justify-between w-full text-left mb-4 group"
+          >
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-lg">
+                <Sparkles className="w-4 h-4 text-amber-600" />
+              </div>
+              <span className="font-semibold text-gray-700">EH Premium Categories</span>
+            </div>
+            <div className="p-1 rounded-lg group-hover:bg-gray-100 transition-colors">
+              {expandedSections.ehCategory ? <ChevronUp className="w-4 h-4 text-gray-500" /> : <ChevronDown className="w-4 h-4 text-gray-500" />}
+            </div>
+          </button>
+          {expandedSections.ehCategory && (
+            <div className="space-y-2">
+              <button
+                onClick={() => handleFilterChange('subcategory', 'all')}
+                className={`w-full px-3 py-2 rounded-lg text-sm font-medium transition-all text-left ${
+                  filters.subcategory === 'all'
+                    ? 'bg-gradient-to-r from-gray-600 to-gray-700 text-white shadow-md'
+                    : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200'
+                }`}
+              >
+                All Properties
+              </button>
+              <button
+                onClick={() => handleFilterChange('subcategory', 'eh_commercial')}
+                className={`w-full px-3 py-2 rounded-lg text-sm font-medium transition-all text-left ${
+                  filters.subcategory === 'eh_commercial'
+                    ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md'
+                    : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Building2 className="w-4 h-4" />
+                  EH Commercial
+                </div>
+              </button>
+              <button
+                onClick={() => handleFilterChange('subcategory', 'eh_verified')}
+                className={`w-full px-3 py-2 rounded-lg text-sm font-medium transition-all text-left ${
+                  filters.subcategory === 'eh_verified'
+                    ? 'bg-gradient-to-r from-green-600 to-emerald-700 text-white shadow-md'
+                    : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4" />
+                  EH Verified
+                </div>
+              </button>
+              <button
+                onClick={() => handleFilterChange('subcategory', 'eh_signature')}
+                className={`w-full px-3 py-2 rounded-lg text-sm font-medium transition-all text-left ${
+                  filters.subcategory === 'eh_signature'
+                    ? 'bg-gradient-to-r from-amber-600 to-yellow-700 text-white shadow-md'
+                    : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Star className="w-4 h-4" />
+                  EH Signature™
+                </div>
+              </button>
+              <button
+                onClick={() => handleFilterChange('subcategory', 'eh_dubai')}
+                className={`w-full px-3 py-2 rounded-lg text-sm font-medium transition-all text-left ${
+                  filters.subcategory === 'eh_dubai'
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-700 text-white shadow-md'
+                    : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <MapPinIcon className="w-4 h-4" />
+                  EH Dubai
+                </div>
+              </button>
+            </div>
+          )}
+        </div>
+
         {/* Property Type Card */}
         <div className="bg-white rounded-xl shadow-md p-5 border border-gray-100">
           <button
@@ -498,17 +666,17 @@ useLayoutEffect(() => {
                 />
                 <span className="text-sm font-medium">All Types</span>
               </label>
-              {Object.entries(PropertyType).map(([key, value]) => (
-                <label key={key} className="flex items-center p-2 rounded-lg hover:bg-gray-50 cursor-pointer">
+              {availablePropertyTypes.map((type) => (
+                <label key={type} className="flex items-center p-2 rounded-lg hover:bg-gray-50 cursor-pointer">
                   <input
                     type="radio"
                     name="propertyType"
-                    value={value}
-                    checked={filters.property_type === value}
+                    value={type}
+                    checked={filters.property_type === type}
                     onChange={(e) => handleFilterChange('property_type', e.target.value)}
                     className="mr-3 text-blue-600"
                   />
-                  <span className="text-sm capitalize font-medium">{value.replace('_', ' ')}</span>
+                  <span className="text-sm capitalize font-medium">{type.replace('_', ' ')}</span>
                 </label>
               ))}
             </div>
@@ -686,7 +854,7 @@ useLayoutEffect(() => {
               </div>
               {/* Popular locations */}
               <div className="mt-3 flex flex-wrap gap-2">
-                {['Bangalore', 'Mumbai', 'Delhi', 'Chennai'].map(city => (
+                {availableLocations.slice(0, 6).map(city => (
                   <button
                     key={city}
                     onClick={() => setLocationInput(city)}
@@ -748,10 +916,8 @@ useLayoutEffect(() => {
       </div>
     </div>
   );
- 
-// Duplicate navHeight state removed; use the original declaration above.
 
-  // Wrap the entire component with LoginPromptOverlay if user is not authenticated
+  // Check authentication and show login overlay if not authenticated
   if (!user) {
     return (
       <LoginPromptOverlay 
@@ -781,9 +947,10 @@ useLayoutEffect(() => {
     );
   }
 
+  // Main return for authenticated users
   return (
-    <div   className="min-h-screen bg-gray-50 pb-8 px-4 -mt-10"
-   style={{ paddingTop: navHeight + 12 }} >
+    <div className="min-h-screen bg-gray-50 pb-8 px-4 -mt-10"
+         style={{ paddingTop: navHeight + 12 }}>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">

@@ -649,10 +649,19 @@ import { Link } from "react-router-dom"; // <--- 1. IMPORT LINK
 import properties from "../data/properties";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
+import WishlistButton from "./common/WishlistButton";
 import "swiper/css";
 import "swiper/css/navigation";
 
-const TABS = ["For Sale", "For Rent", "Luxury Rentals", "EH Signature™"];
+const TABS = [
+  "For Sale", 
+  "For Rent", 
+  "Luxury Rentals",
+  "EH Commercial",
+  "EH Verified",
+  "EH Signature™",
+  "EH Dubai"
+];
 const PLACEHOLDER = "/images/properties/placeholder.jpg";
 
 /** Title helper (fallback to filename if needed) */
@@ -678,6 +687,28 @@ const normalize = (p = {}) => {
   const title =
     titleRaw || deriveTitleFromImage(firstImage) || `Property ${p.id ?? ""}`.trim();
 
+  // Determine display category based on subcategory first, then regular category
+  let displayCategory = p.category || p.tag || p.listingType || "For Sale";
+  
+  // Check subcategory for EH categories
+  if (p.subcategory === 'eh_commercial') {
+    displayCategory = 'EH Commercial';
+  } else if (p.subcategory === 'eh_verified') {
+    displayCategory = 'EH Verified';
+  } else if (p.subcategory === 'eh_signature') {
+    displayCategory = 'EH Signature™';
+  } else if (p.subcategory === 'eh_dubai') {
+    displayCategory = 'EH Dubai';
+  } else if (p.category === 'lease') {
+    displayCategory = 'Luxury Rentals';
+  } else if (p.category === 'sale') {
+    displayCategory = 'For Sale';
+  } else if (p.category === 'rent') {
+    displayCategory = 'For Rent';
+  } else if (p.category === 'rent_to_own') {
+    displayCategory = 'EH Signature™'; // Fallback for old data
+  }
+
   return {
     id: p.id ?? Math.random().toString(36).slice(2),
     title,
@@ -686,11 +717,9 @@ const normalize = (p = {}) => {
     type: p.type || (p.bhk ? `${p.bhk} BHK` : "") || p.propertyType || "",
     area: p.area || p.sqft || p.size || "",
     price: p.price || p.rate || "",
-    category: p.category || p.tag || p.listingType || "For Sale",
-    categoryNormalized: (p.category || p.tag || p.listingType || "For Sale")
-      .toString()
-      .trim()
-      .toLowerCase(),
+    category: displayCategory,
+    categoryNormalized: displayCategory.toString().trim().toLowerCase(),
+    subcategory: p.subcategory,
     raw: p,
   };
 };
@@ -704,7 +733,7 @@ const getPerView = () => {
   return 1;
 };
 
-export default function PropertyListing({ listings }) {
+export default function PropertyListing({ listings, onPropertyClick, showLoginPrompt }) {
   const sourceData = (Array.isArray(listings) && listings.length > 0) ? listings : properties;
   const data = useMemo(() => sourceData.map(normalize), [sourceData]);
 
@@ -755,13 +784,13 @@ export default function PropertyListing({ listings }) {
       <div className="max-w-7xl mx-auto">
         {/* Tabs */}
         <div className="mb-8 flex justify-center">
-          <div className="w-full max-w-4xl rounded-xl bg-[#1C75BC14] p-1 flex gap-2 overflow-x-auto md:justify-center">
+          <div className="w-full max-w-6xl rounded-xl bg-[#1C75BC14] p-1 flex gap-1 overflow-x-auto scrollbar-hide md:justify-center">
             {TABS.map((t, i) => (
               <button
                 key={t}
                 onClick={() => setActiveTab(i)}
                 className={[
-                  "px-4 py-2 md:px-6 rounded-full text-sm md:text-base font-medium whitespace-nowrap transition",
+                  "px-3 py-2 md:px-4 rounded-full text-xs md:text-sm font-medium whitespace-nowrap transition flex-shrink-0",
                   activeTab === i
                     ? "bg-white text-[#E7000B] shadow"
                     : "text-gray-700 hover:bg-gray-200",
@@ -810,7 +839,7 @@ export default function PropertyListing({ listings }) {
             >
               {items.map((it, idx) => (
                 <SwiperSlide key={`${it.id}-${idx}`}>
-                  <Card item={it} index={idx} />
+                  <Card item={it} index={idx} onPropertyClick={onPropertyClick} />
                 </SwiperSlide>
               ))}
             </Swiper>
@@ -835,7 +864,7 @@ export default function PropertyListing({ listings }) {
 }
 
 // Card component - UPDATED
-function Card({ item, index }) {
+function Card({ item, index, onPropertyClick }) {
   const { id, title, image, location, type, area, price } = item;
   const imgFirst = index % 2 === 0;
 
@@ -847,6 +876,14 @@ function Card({ item, index }) {
         className="absolute inset-0 h-full w-full object-cover"
         loading="lazy"
       />
+      {/* Add Wishlist Button */}
+      <div className="absolute top-3 right-3 z-10">
+        <WishlistButton 
+          propertyId={id} 
+          variant="floating"
+          size="md"
+        />
+      </div>
     </div>
   );
 
@@ -862,13 +899,22 @@ function Card({ item, index }) {
       </div>
       <div className="mt-3 flex items-center justify-between">
         <div className="text-2xl font-bold text-gray-900">{price}</div>
-        {/* --- 2. REPLACE BUTTON WITH LINK --- */}
-        <Link
-          to={`/properties/${id}`}
-          className="rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white shadow transition-colors hover:bg-red-700"
-        >
-          View Details
-        </Link>
+        {/* Use onPropertyClick if provided, otherwise direct navigation */}
+        {onPropertyClick ? (
+          <button
+            onClick={(e) => onPropertyClick(index, e)}
+            className="rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white shadow transition-colors hover:bg-red-700"
+          >
+            View Details
+          </button>
+        ) : (
+          <Link
+            to={`/properties/${id}`}
+            className="rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white shadow transition-colors hover:bg-red-700"
+          >
+            View Details
+          </Link>
+        )}
       </div>
     </div>
   );

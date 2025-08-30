@@ -22,6 +22,10 @@ export const propertyService = {
         query = query.eq('category', filters.category);
       }
       
+      if (filters.subcategory && filters.subcategory !== 'all') {
+        query = query.eq('subcategory', filters.subcategory);
+      }
+      
       if (filters.city) {
         query = query.ilike('city', `%${filters.city}%`);
       }
@@ -376,6 +380,50 @@ export const propertyService = {
     } catch (error) {
       console.error('Error fetching statistics:', error);
       return { data: null, error: error.message };
+    }
+  },
+
+  // Get unique cities from properties
+  async getUniqueCities() {
+    try {
+      const { data, error } = await supabase
+        .from('properties')
+        .select('city')
+        .eq('status', 'active')
+        .not('city', 'is', null);
+
+      if (error) throw error;
+
+      // Get unique cities and filter out empty strings
+      const uniqueCities = [...new Set(data.map(p => p.city).filter(city => city && city.trim()))]
+        .sort((a, b) => a.localeCompare(b));
+
+      return { data: uniqueCities, error: null };
+    } catch (error) {
+      console.error('Error fetching unique cities:', error);
+      return { data: ['Bengaluru', 'Bangalore'], error: error.message }; // Fallback cities
+    }
+  },
+
+  // Get unique property types from properties
+  async getUniquePropertyTypes() {
+    try {
+      const { data, error } = await supabase
+        .from('properties')
+        .select('property_type')
+        .eq('status', 'active')
+        .not('property_type', 'is', null);
+
+      if (error) throw error;
+
+      // Get unique property types and filter out empty strings
+      const uniqueTypes = [...new Set(data.map(p => p.property_type).filter(type => type && type.trim()))]
+        .sort((a, b) => a.localeCompare(b));
+
+      return { data: uniqueTypes, error: null };
+    } catch (error) {
+      console.error('Error fetching unique property types:', error);
+      return { data: ['Apartment', 'Villa', 'Penthouse', 'Plot', 'Commercial'], error: error.message }; // Fallback types
     }
   }
 };

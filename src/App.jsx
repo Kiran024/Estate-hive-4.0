@@ -35,6 +35,9 @@ const EHGeoHeat         = lazy(() => import('./components/technologies/EHGeoHeat
 const SmartMatchEngine  = lazy(() => import('./components/technologies/SmartMatchEngine'));
 const Career            = lazy(() => import('./components/careers'));
 const Autherization     = lazy(() => import('./components/AuthPage'));
+const AuthCallback      = lazy(() => import('./pages/AuthCallback'));
+const SavedProperties   = lazy(() => import('./pages/SavedProperties'));
+const Settings          = lazy(() => import('./pages/Settings'));
 const ContactUs         = lazy(() => import('./components/ContactUs'));
 const Confirmed         = lazy(() => import('./pages/Confirmed'));
 const UserProfile       = lazy(() => import('./components/UserProfile'));
@@ -129,6 +132,9 @@ const Layout = () => {
             <Route path="/smart-match-engine" element={<SmartMatchEngine />} />
             <Route path="/careers" element={<Career />} />
             <Route path="/auth" element={<Autherization />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/saved" element={<SavedProperties />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="/contact-us" element={<ContactUs />} />
             <Route path="/properties" element={<AllProperties />} />
             <Route path="/properties/:id" element={<PropertyDetails />} />

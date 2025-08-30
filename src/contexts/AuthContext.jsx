@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '../services/authService';
-import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext({});
 
@@ -16,34 +15,47 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
+    let mounted = true;
+    
     // Check active session
-    checkUser();
+    const initAuth = async () => {
+      try {
+        const currentUser = await authService.getCurrentUser();
+        if (mounted) {
+          setUser(currentUser);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Error checking user:', error);
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+    
+    initAuth();
 
     // Listen for auth changes
     const { data: { subscription } } = authService.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN') {
+      if (!mounted) return;
+      
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         setUser(session?.user || null);
+        setLoading(false);
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
+        setLoading(false);
       }
     });
 
-    return () => subscription?.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription?.unsubscribe();
+    };
   }, []);
 
-  const checkUser = async () => {
-    try {
-      const currentUser = await authService.getCurrentUser();
-      setUser(currentUser);
-    } catch (error) {
-      console.error('Error checking user:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const signUp = async (email, password, metadata = {}) => {
     try {
@@ -79,14 +91,17 @@ export const AuthProvider = ({ children }) => {
   const signOut = async () => {
     try {
       setError(null);
-      setLoading(true);
       await authService.signOut();
       setUser(null);
-      navigate('/');
+      // Force reload to clear any cached data
+      window.location.href = '/#/';
+      window.location.reload();
     } catch (error) {
+      console.error('Sign out error:', error);
       setError(error.message);
-    } finally {
-      setLoading(false);
+      // Force sign out even on error
+      setUser(null);
+      window.location.href = '/#/';
     }
   };
 
@@ -142,8 +157,7 @@ export const AuthProvider = ({ children }) => {
     signOut,
     resetPassword,
     updatePassword,
-    updateProfile,
-    checkUser
+    updateProfile
   };
 
   return (
