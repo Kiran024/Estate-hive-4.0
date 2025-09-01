@@ -15,6 +15,7 @@ import { useAuth } from '../contexts/AuthContext';
 import LoginPromptOverlay from '../components/auth/LoginPromptOverlay';
 import WishlistButton from '../components/common/WishlistButton';
 
+
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
 
 export default function PropertyDetailsEnhanced() {
@@ -33,7 +34,7 @@ export default function PropertyDetailsEnhanced() {
     enabled: !!id,
     retry: 2
   });
-
+  
   const property = propertyResponse?.data;
 
   // Fetch similar properties - get more for carousel
@@ -46,9 +47,62 @@ export default function PropertyDetailsEnhanced() {
   const similarProperties = similarPropertiesResponse?.data || [];
   
   // Carousel state
-  const [carouselIndex, setCarouselIndex] = useState(0);
-  const itemsPerView = 3; // Number of items visible at once
-  const maxIndex = Math.max(0, Math.ceil(similarProperties.length / itemsPerView) - 1);
+  const simListRef = useRef(null);
+const [itemsPerView, setItemsPerView] = useState(3);
+const [activePage, setActivePage] = useState(0);
+const [canLeft, setCanLeft] = useState(false);
+const [canRight, setCanRight] = useState(false);
+
+const computeItemsPerView = (w) => (w < 640 ? 1 : w < 1024 ? 2 : 3);
+
+useEffect(() => {
+  const onResize = () => setItemsPerView(computeItemsPerView(window.innerWidth));
+  onResize();
+  window.addEventListener('resize', onResize);
+  return () => window.removeEventListener('resize', onResize);
+}, []);
+
+const measure = () => {
+  const el = simListRef.current;
+  if (!el) return { cardW: 0, gap: 0 };
+  const first = el.querySelector("[data-slide='true']");
+  const cardW = first?.getBoundingClientRect().width || el.clientWidth / itemsPerView;
+  const gap = parseFloat(getComputedStyle(el).gap) || 0; // Tailwind gap-6 => 24px
+  return { cardW, gap };
+};
+
+const updateNavState = () => {
+  const el = simListRef.current;
+  if (!el) return;
+  const { cardW, gap } = measure();
+  const pageStep = (cardW + gap) * itemsPerView;
+  const cur = Math.round(el.scrollLeft / Math.max(pageStep, 1));
+  setActivePage(cur);
+  setCanLeft(el.scrollLeft > 1);
+  setCanRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+};
+
+useEffect(() => {
+  const el = simListRef.current;
+  if (!el) return;
+  updateNavState();
+  el.addEventListener('scroll', updateNavState, { passive: true });
+  return () => el.removeEventListener('scroll', updateNavState);
+}, [itemsPerView, similarProperties.length]);
+
+const scrollByCards = (dir /* -1 or +1 */) => {
+  const el = simListRef.current;
+  if (!el) return;
+  const { cardW, gap } = measure();
+  el.scrollBy({ left: dir * (cardW + gap), behavior: 'smooth' });
+};
+
+const goToPage = (pageIndex) => {
+  const el = simListRef.current;
+  if (!el) return;
+  const { cardW, gap } = measure();
+  el.scrollTo({ left: pageIndex * (cardW + gap) * itemsPerView, behavior: 'smooth' });
+};
 
   // Initialize map
   useEffect(() => {
@@ -90,6 +144,8 @@ export default function PropertyDetailsEnhanced() {
       }
     }
   }, [property]);
+
+  
 
   // Removed handleFavorite - now handled by WishlistButton
 
@@ -574,102 +630,124 @@ Don't miss this opportunity to ${property.category === 'sale' ? 'own' : 'rent'} 
           </div>
         </div>
 
-        {/* Similar Properties */}
-        {similarProperties.length > 0 && (
-          <div className="mt-12">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold">Similar Properties in {property.city || 'this area'}</h2>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setCarouselIndex(Math.max(0, carouselIndex - itemsPerView))}
-                  disabled={carouselIndex === 0}
-                  className={`p-2 rounded-lg transition-colors ${
-                    carouselIndex === 0 
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                      : 'bg-white border border-gray-300 hover:bg-gray-50 text-gray-700'
-                  }`}
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => setCarouselIndex(Math.min(maxIndex, carouselIndex + itemsPerView))}
-                  disabled={carouselIndex >= maxIndex}
-                  className={`p-2 rounded-lg transition-colors ${
-                    carouselIndex >= maxIndex 
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                      : 'bg-white border border-gray-300 hover:bg-gray-50 text-gray-700'
-                  }`}
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
+     {similarProperties.length > 0 && (
+  <div className="mt-12">
+    <div className="flex items-center justify-between mb-6">
+      <h2 className="text-2xl font-semibold">
+        Similar Properties in {property.city || 'this area'}
+      </h2>
+
+      <div className="flex gap-2">
+        <button
+          onClick={() => scrollByCards(-1)}
+          disabled={!canLeft}
+          className={`p-2 rounded-lg transition-colors ${
+            !canLeft
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : 'bg-white border border-gray-300 hover:bg-gray-50 text-gray-700'
+          }`}
+          aria-label="Previous"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        <button
+          onClick={() => scrollByCards(1)}
+          disabled={!canRight}
+          className={`p-2 rounded-lg transition-colors ${
+            !canRight
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : 'bg-white border border-gray-300 hover:bg-gray-50 text-gray-700'
+          }`}
+          aria-label="Next"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
+    </div>
+
+    <div className="relative">
+      {/* Hide scrollbars utility (works without Tailwind plugin) */}
+      <style>{`
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
+
+      <div
+        ref={simListRef}
+        className="
+          no-scrollbar flex overflow-x-auto scroll-smooth
+          snap-x snap-mandatory gap-6 pb-2
+        "
+      >
+        {similarProperties.map((similar) => (
+          <Link
+            key={similar.id}
+            to={`/property/${similar.id}`}
+            data-slide="true"
+            className="
+              snap-start flex-shrink-0
+              basis-full sm:basis-1/2 lg:basis-1/3
+              bg-white rounded-xl shadow-sm overflow-hidden
+              hover:shadow-lg transition-shadow
+            "
+          >
+            <img
+              src={similar.image_urls?.[0] || '/h01@300x-100.jpg'}
+              alt={similar.title}
+              className="w-full h-44 sm:h-48 object-cover"
+              onError={(e) => { e.currentTarget.src = '/h01@300x-100.jpg'; }}
+            />
+            <div className="p-4">
+              <h3 className="font-semibold text-lg mb-1 line-clamp-1">
+                {similar.title}
+              </h3>
+              <p className="text-gray-600 text-sm mb-2">
+                {similar.neighborhood || similar.city}
+              </p>
+              <p className="text-xl font-bold text-blue-600">
+                {formatPrice(similar.price || similar.rent_amount)}
+              </p>
+              <div className="flex items-center gap-4 mt-3 text-gray-600 text-sm">
+                {similar.bedrooms && (
+                  <span className="flex items-center gap-1">
+                    <Bed className="w-4 h-4" /> {similar.bedrooms}
+                  </span>
+                )}
+                {similar.bathrooms && (
+                  <span className="flex items-center gap-1">
+                    <Bath className="w-4 h-4" /> {similar.bathrooms}
+                  </span>
+                )}
+                {similar.area_sqft && (
+                  <span className="flex items-center gap-1">
+                    <Ruler className="w-4 h-4" /> {similar.area_sqft} sqft
+                  </span>
+                )}
               </div>
             </div>
-            
-            <div className="relative overflow-hidden">
-              <div 
-                className="flex transition-transform duration-300 ease-in-out gap-6"
-                style={{ transform: `translateX(-${carouselIndex * (100 / itemsPerView + 2)}%)` }}
-              >
-                {similarProperties.map((similar) => (
-                  <Link 
-                    key={similar.id} 
-                    to={`/property/${similar.id}`}
-                    className="flex-shrink-0 bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow"
-                    style={{ width: `calc(${100 / itemsPerView}% - 1rem)` }}
-                  >
-                    <img
-                      src={similar.image_urls?.[0] || '/h01@300x-100.jpg'}
-                      alt={similar.title}
-                      className="w-full h-48 object-cover"
-                      onError={(e) => { e.target.src = '/h01@300x-100.jpg'; }}
-                    />
-                    <div className="p-4">
-                      <h3 className="font-semibold text-lg mb-1 line-clamp-1">{similar.title}</h3>
-                      <p className="text-gray-600 text-sm mb-2">
-                        {similar.neighborhood || similar.city}
-                      </p>
-                      <p className="text-xl font-bold text-blue-600">
-                        {formatPrice(similar.price || similar.rent_amount)}
-                      </p>
-                      <div className="flex items-center gap-4 mt-3 text-gray-600 text-sm">
-                        {similar.bedrooms && (
-                          <span className="flex items-center gap-1">
-                            <Bed className="w-4 h-4" /> {similar.bedrooms}
-                          </span>
-                        )}
-                        {similar.bathrooms && (
-                          <span className="flex items-center gap-1">
-                            <Bath className="w-4 h-4" /> {similar.bathrooms}
-                          </span>
-                        )}
-                        {similar.area_sqft && (
-                          <span className="flex items-center gap-1">
-                            <Ruler className="w-4 h-4" /> {similar.area_sqft} sqft
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-            
-            {/* Carousel indicators */}
-            <div className="flex justify-center gap-1 mt-4">
-              {Array.from({ length: Math.ceil(similarProperties.length / itemsPerView) }).map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCarouselIndex(index * itemsPerView)}
-                  className={`w-2 h-2 rounded-full transition-colors ${
-                    Math.floor(carouselIndex / itemsPerView) === index 
-                      ? 'bg-blue-600' 
-                      : 'bg-gray-300'
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-        )}
+          </Link>
+        ))}
+      </div>
+    </div>
+
+    {/* Carousel indicators */}
+    <div className="flex justify-center gap-1 mt-4">
+      {Array.from({
+        length: Math.max(1, Math.ceil(similarProperties.length / itemsPerView)),
+      }).map((_, index) => (
+        <button
+          key={index}
+          onClick={() => goToPage(index)}
+          className={`w-2 h-2 rounded-full transition-colors ${
+            activePage === index ? 'bg-blue-600' : 'bg-gray-300'
+          }`}
+          aria-label={`Go to page ${index + 1}`}
+        />
+      ))}
+    </div>
+  </div>
+)}
+
       </div>
     </div>
   );

@@ -136,7 +136,7 @@ const HeroSection = () => {
     <section
       className="scroll-smooth relative w-full min-h-[120vh] md:h-[150vh] bg-no-repeat bg-cover bg-center text-white overflow-hidden flex items-center justify-center"
       style={{
-        backgroundImage: "url('/bg-Early-mrng.jpg')",
+        backgroundImage: "url('/Homepage1.webp')",
         backgroundAttachment: isSafari ? 'scroll' : 'fixed',
         backgroundSize: 'cover',
         backgroundPosition: isSafari ? 'center center' : parallaxBackgroundPosition,

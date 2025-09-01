@@ -483,10 +483,10 @@ function EHCommercial() {
                           whileInView={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.8 }}
                           viewport={{ once: true }}
-                          className="text-3xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-gray-800 via-red-600 to-gray-900 bg-clip-text text-transparent tracking-tight"
+                          className="text-3xl md:text-6xl font-bold mb-4 text-black bg-clip-text  tracking-tight"
                           style={{ fontFamily: "'Exo 2', sans-serif" }}
                       >
-                          Why Choose <span className="text-red-600">EH Commercial™</span><span className="text-gray-800">?</span>
+                          Why Choose <span className="text-red-600">EH Commercial™</span><span className="text-red-600">?</span>
                       </motion.h2>
 
                       <motion.p
@@ -510,7 +510,7 @@ function EHCommercial() {
                               whileInView={{ opacity: 1, y: 0 }}
                               transition={{ duration: 0.5, delay: index * 0.2 }}
                               viewport={{ once: true }}
-                              className="bg-white border rounded-2xl shadow-xl hover:shadow-2xl transition duration-300 p-6 text-center hover:scale-[1.03]"
+                              className="bg-white  rounded-2xl shadow-xl hover:shadow-2xl transition duration-300 p-6 text-center hover:scale-[1.03]"
                           >
                               {/* Icon */}
                               <div className="flex justify-center mb-4">

@@ -655,12 +655,13 @@ import "swiper/css/navigation";
 
 const TABS = [
   "For Sale", 
+  "EH Dubai",
   "For Rent", 
   "Luxury Rentals",
   "EH Commercial",
   "EH Verified",
   "EH Signature™",
-  "EH Dubai"
+ 
 ];
 const PLACEHOLDER = "/images/properties/placeholder.jpg";
 
@@ -714,7 +715,7 @@ const normalize = (p = {}) => {
     title,
     image: firstImage || p.image || p.img || p.src || PLACEHOLDER,
     location: p.location || p.city || p.area || p.town || "",
-    type: p.type || (p.bhk ? `${p.bhk} BHK` : "") || p.propertyType || "",
+    type: p.type || (p.bhk ? `${p.bhk}` : "") || p.propertyType || "",
     area: p.area || p.sqft || p.size || "",
     price: p.price || p.rate || "",
     category: displayCategory,

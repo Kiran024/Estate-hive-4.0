@@ -10,7 +10,7 @@ import 'swiper/css/navigation'; // Import navigation CSS
 // No 'swiper/css/pagination' needed as dots are removed
 
 // Set your Mapbox access token
-mapboxgl.accessToken = 'pk.eyJ1IjoibWFzaHAxMjMiLCJhIjoiY21kMnMwNjhiMXExczJtcXRsMWJuaDdiOSJ9.NhR2comESVqPZCcL5mDrHg'; // Using the provided token
+mapboxgl.accessToken = 'pk.eyJ1IjoibWFzaHAxMjMiLCJhIjoiY21lZ3ZrdjBpMDFjOTJucjVtdHBpbWp6aiJ9.KNoKUUUFr1f_mC53ZjsPFg'// Using the provided token
 
 function EHGeoHeat() {
   // Ref for the map container

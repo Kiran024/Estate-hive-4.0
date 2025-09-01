@@ -26,48 +26,58 @@ export const propertyService = {
         query = query.eq('subcategory', filters.subcategory);
       }
       
-      if (filters.city) {
-        query = query.ilike('city', `%${filters.city}%`);
-      }
+      // Location: accept a single string or an array of strings
+      if (filters.locationQuery) {
+        const locs = Array.isArray(filters.locationQuery)
+          ? filters.locationQuery
+          : [filters.locationQuery];
+        const parts = [];
+        locs.forEach((loc) => {
+          if (!loc) return;
+          parts.push(`city.ilike.%${loc}%`);
+          parts.push(`neighborhood.ilike.%${loc}%`);
+        });
+        if (parts.length) query = query.or(parts.join(','));
+      } else if (filters.city) {
+         query = query.ilike('city', `%${filters.city}%`);
+       }
+
+       if (filters.min_price) {
+         query = query.gte('price', filters.min_price);
+       }
+       if (filters.max_price) {
+         query = query.lte('price', filters.max_price);
+       }
       
-      if (filters.min_price) {
-        query = query.gte('price', filters.min_price);
+      // More natural “2+” filters
+      if (filters.bedrooms_min) {
+        query = query.gte('bedrooms', Number(filters.bedrooms_min));
       }
-      
-      if (filters.max_price) {
-        query = query.lte('price', filters.max_price);
-      }
-      
-      if (filters.bedrooms) {
-        query = query.eq('bedrooms', filters.bedrooms);
-      }
-      
-      if (filters.bathrooms) {
-        query = query.eq('bathrooms', filters.bathrooms);
-      }
-      
-      if (filters.furnishing_status && filters.furnishing_status !== 'all') {
-        query = query.eq('furnishing_status', filters.furnishing_status);
-      }
-      
-      // Search by title or description
-      if (filters.search) {
-        query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
+      if (filters.bathrooms_min) {
+        query = query.gte('bathrooms', Number(filters.bathrooms_min));
       }
 
-      // Sorting
-      const sortBy = filters.sortBy || 'created_at';
-      const sortOrder = filters.sortOrder || 'desc';
-      query = query.order(sortBy, { ascending: sortOrder === 'asc' });
+       if (filters.furnishing_status && filters.furnishing_status !== 'all') {
+         query = query.eq('furnishing_status', filters.furnishing_status);
+       }
 
-      // Pagination
+       if (filters.search) {
+         query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
+       }
+
+       const sortBy = filters.sortBy || 'created_at';
+       const sortOrder = filters.sortOrder || 'desc';
+       query = query.order(sortBy, { ascending: sortOrder === 'asc' });
+
       if (filters.page && filters.pageSize) {
-        const from = (filters.page - 1) * filters.pageSize;
-        const to = from + filters.pageSize - 1;
-        query = query.range(from, to);
-      } else if (filters.pageSize) {
-        // If only pageSize is provided, get first page
-        query = query.range(0, filters.pageSize - 1);
+         const from = (filters.page - 1) * filters.pageSize;
+         const to = from + filters.pageSize - 1;
+         query = query.range(from, to);
+               } else if (filters.pageSize) {
+         query = query.range(0, filters.pageSize - 1);
+      } else {
+        // generous default so “All” feels like “show everything”
+        query = query.range(0, 59);
       }
 
       const { data, error, count } = await query;
