@@ -16,7 +16,7 @@ const UserProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  // Removed avatar upload functionality
   const [activeTab, setActiveTab] = useState('profile');
   
   const [formData, setFormData] = useState({
@@ -148,26 +148,12 @@ const UserProfile = () => {
     }
   };
 
-  const handleAvatarUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    try {
-      setUploadingAvatar(true);
-      const avatarUrl = await userService.uploadAvatar(user.id, file);
-      setProfile({ ...profile, avatar_url: avatarUrl });
-    } catch (error) {
-      console.error('Error uploading avatar:', error);
-      alert('Failed to upload avatar. Please try again.');
-    } finally {
-      setUploadingAvatar(false);
-    }
-  };
+  // Avatar upload functionality removed
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pt-24 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style={{ borderColor: '#1B1B59' }}></div>
       </div>
     );
   }
@@ -182,13 +168,13 @@ const UserProfile = () => {
           className="bg-white rounded-3xl shadow-xl overflow-hidden mb-8"
         >
           {/* Cover Image */}
-          <div className="h-48 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 relative">
-            <div className="absolute inset-0 bg-black/20"></div>
+          <div className="h-48 relative" style={{ backgroundColor: '#1B1B59' }}>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/30"></div>
           </div>
 
           {/* Profile Info */}
           <div className="relative px-8 pb-8">
-            <div className="flex flex-col sm:flex-row items-center sm:items-end -mt-20 sm:-mt-16 gap-6">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start -mt-16 gap-6">
               {/* Avatar */}
               <div className="relative group">
                 <motion.div 
@@ -202,21 +188,10 @@ const UserProfile = () => {
                       className="w-32 h-32 rounded-2xl border-4 border-white shadow-xl object-cover bg-white"
                     />
                   ) : (
-                    <div className="w-32 h-32 rounded-2xl border-4 border-white shadow-xl bg-gradient-to-br from-indigo-400 to-purple-600 flex items-center justify-center">
+                    <div className="w-32 h-32 rounded-2xl border-4 border-white shadow-xl flex items-center justify-center" style={{ backgroundColor: '#1B1B59' }}>
                       <FiUser className="text-white text-4xl" />
                     </div>
                   )}
-                  
-                  <label className="absolute bottom-2 right-2 bg-white p-2 rounded-lg shadow-lg cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
-                    <FiCamera className={`text-gray-600 ${uploadingAvatar ? 'animate-pulse' : ''}`} />
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleAvatarUpload}
-                      disabled={uploadingAvatar}
-                    />
-                  </label>
                 </motion.div>
               </div>
 
@@ -253,7 +228,8 @@ const UserProfile = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsEditing(!isEditing)}
-                className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-700 transition-colors flex items-center gap-2 shadow-lg"
+                className="text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center gap-2 shadow-lg"
+                style={{ backgroundColor: '#1B1B59' }}
               >
                 {isEditing ? (
                   <>
@@ -282,8 +258,8 @@ const UserProfile = () => {
                 <p className="text-gray-600 text-sm">Properties Viewed</p>
                 <p className="text-3xl font-bold text-gray-900 mt-1">{stats.propertiesViewed}</p>
               </div>
-              <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center">
-                <FiEye className="text-indigo-600 text-xl" />
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#1B1B5920' }}>
+                <FiEye className="text-xl" style={{ color: '#1B1B59' }} />
               </div>
             </div>
           </motion.div>
@@ -299,8 +275,8 @@ const UserProfile = () => {
                 <p className="text-gray-600 text-sm">Saved Properties</p>
                 <p className="text-3xl font-bold text-gray-900 mt-1">{stats.propertiesSaved}</p>
               </div>
-              <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center">
-                <FiHeart className="text-pink-600 text-xl" />
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#1B1B5920' }}>
+                <FiHeart className="text-xl" style={{ color: '#1B1B59' }} />
               </div>
             </div>
           </motion.div>
@@ -316,8 +292,8 @@ const UserProfile = () => {
                 <p className="text-gray-600 text-sm">Inquiries Sent</p>
                 <p className="text-3xl font-bold text-gray-900 mt-1">{stats.inquiriesSent}</p>
               </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                <FiMail className="text-purple-600 text-xl" />
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#1B1B5920' }}>
+                <FiMail className="text-xl" style={{ color: '#1B1B59' }} />
               </div>
             </div>
           </motion.div>
@@ -333,8 +309,8 @@ const UserProfile = () => {
                 <p className="text-gray-600 text-sm">Member Since</p>
                 <p className="text-xl font-bold text-gray-900 mt-1">{stats.memberSince}</p>
               </div>
-              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                <FiCalendar className="text-green-600 text-xl" />
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#1B1B5920' }}>
+                <FiCalendar className="text-xl" style={{ color: '#1B1B59' }} />
               </div>
             </div>
           </motion.div>
@@ -348,9 +324,10 @@ const UserProfile = () => {
                 onClick={() => setActiveTab('profile')}
                 className={`flex-1 px-6 py-4 font-medium transition-colors ${
                   activeTab === 'profile' 
-                    ? 'text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/50' 
+                    ? 'border-b-2' 
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
+                style={activeTab === 'profile' ? { color: '#1B1B59', borderColor: '#1B1B59', backgroundColor: 'rgba(27, 27, 89, 0.05)' } : {}}
               >
                 Profile Information
               </button>
@@ -358,9 +335,10 @@ const UserProfile = () => {
                 onClick={() => setActiveTab('settings')}
                 className={`flex-1 px-6 py-4 font-medium transition-colors ${
                   activeTab === 'settings' 
-                    ? 'text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/50' 
+                    ? 'border-b-2' 
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
+                style={activeTab === 'settings' ? { color: '#1B1B59', borderColor: '#1B1B59', backgroundColor: 'rgba(27, 27, 89, 0.05)' } : {}}
               >
                 Settings
               </button>
@@ -389,7 +367,7 @@ const UserProfile = () => {
                           name="full_name"
                           value={formData.full_name}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:border-transparent transition-all focus:ring-[#1B1B59]"
                           placeholder="Enter your full name"
                         />
                       </div>
@@ -403,7 +381,7 @@ const UserProfile = () => {
                           name="email"
                           value={formData.email}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:border-transparent transition-all focus:ring-[#1B1B59]"
                           placeholder="your@email.com"
                           disabled
                         />
@@ -418,7 +396,7 @@ const UserProfile = () => {
                           name="phone"
                           value={formData.phone}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:border-transparent transition-all focus:ring-[#1B1B59]"
                           placeholder="+1 (555) 000-0000"
                         />
                       </div>
@@ -432,7 +410,7 @@ const UserProfile = () => {
                           name="occupation"
                           value={formData.occupation}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:border-transparent transition-all focus:ring-[#1B1B59]"
                           placeholder="Real Estate Agent"
                         />
                       </div>
@@ -446,7 +424,7 @@ const UserProfile = () => {
                           name="city"
                           value={formData.city}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:border-transparent transition-all focus:ring-[#1B1B59]"
                           placeholder="San Francisco"
                         />
                       </div>
@@ -460,7 +438,7 @@ const UserProfile = () => {
                           name="state"
                           value={formData.state}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:border-transparent transition-all focus:ring-[#1B1B59]"
                           placeholder="California"
                         />
                       </div>
@@ -474,7 +452,7 @@ const UserProfile = () => {
                           name="country"
                           value={formData.country}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:border-transparent transition-all focus:ring-[#1B1B59]"
                           placeholder="United States"
                         />
                       </div>
@@ -488,7 +466,7 @@ const UserProfile = () => {
                           name="website"
                           value={formData.website}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:border-transparent transition-all focus:ring-[#1B1B59]"
                           placeholder="https://example.com"
                         />
                       </div>
@@ -522,7 +500,8 @@ const UserProfile = () => {
                         whileTap={{ scale: 0.95 }}
                         onClick={handleSaveProfile}
                         disabled={saving}
-                        className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+                        className="text-white rounded-xl font-medium transition-colors flex items-center gap-2 disabled:opacity-50 px-6 py-3 hover:shadow-lg"
+                        style={{ backgroundColor: '#1B1B59' }}
                       >
                         {saving ? (
                           <>
@@ -594,15 +573,15 @@ const UserProfile = () => {
                     <div className="space-y-3">
                       <label className="flex items-center justify-between p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors">
                         <span className="text-gray-700">Email notifications for new properties</span>
-                        <input type="checkbox" className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500" defaultChecked />
+                        <input type="checkbox" className="w-5 h-5 rounded focus:ring-[#1B1B59]" style={{ accentColor: '#1B1B59' }} defaultChecked />
                       </label>
                       <label className="flex items-center justify-between p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors">
                         <span className="text-gray-700">SMS alerts for price drops</span>
-                        <input type="checkbox" className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500" />
+                        <input type="checkbox" className="w-5 h-5 rounded focus:ring-[#1B1B59]" style={{ accentColor: '#1B1B59' }} />
                       </label>
                       <label className="flex items-center justify-between p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors">
                         <span className="text-gray-700">Newsletter subscription</span>
-                        <input type="checkbox" className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500" defaultChecked />
+                        <input type="checkbox" className="w-5 h-5 rounded focus:ring-[#1B1B59]" style={{ accentColor: '#1B1B59' }} defaultChecked />
                       </label>
                     </div>
                   </div>
@@ -612,11 +591,11 @@ const UserProfile = () => {
                     <div className="space-y-3">
                       <label className="flex items-center justify-between p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors">
                         <span className="text-gray-700">Make profile public</span>
-                        <input type="checkbox" className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500" />
+                        <input type="checkbox" className="w-5 h-5 rounded focus:ring-[#1B1B59]" style={{ accentColor: '#1B1B59' }} />
                       </label>
                       <label className="flex items-center justify-between p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors">
                         <span className="text-gray-700">Show contact information</span>
-                        <input type="checkbox" className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500" />
+                        <input type="checkbox" className="w-5 h-5 rounded focus:ring-[#1B1B59]" style={{ accentColor: '#1B1B59' }} />
                       </label>
                     </div>
                   </div>

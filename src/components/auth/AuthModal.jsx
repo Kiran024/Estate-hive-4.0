@@ -114,7 +114,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
           className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden"
         >
           {/* Header with gradient */}
-          <div className="relative bg-gradient-to-r from-indigo-600 to-purple-600 p-6 pb-10">
+          <div className="relative p-6 pb-10" style={{ backgroundColor: '#1B1B59' }}>
             <button
               onClick={onClose}
               className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"
@@ -236,7 +236,8 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
                   disabled={isLoading}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ backgroundColor: '#1B1B59' }}
                 >
                   {isLoading ? (
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />

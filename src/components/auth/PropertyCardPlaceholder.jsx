@@ -31,12 +31,12 @@ const PropertyCardPlaceholder = ({ index = 0 }) => {
               }}
               className="bg-white/90 backdrop-blur-md rounded-full p-3"
             >
-              <Lock className="w-6 h-6 text-gray-800" />
+              <Lock className="w-6 h-6" style={{ color: '#1B1B59' }} />
             </motion.div>
           </div>
 
           {/* Premium Badge */}
-          <div className="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
+          <div className="absolute top-3 left-3 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg flex items-center gap-1" style={{ backgroundColor: '#1B1B59' }}>
             <Sparkles className="w-3 h-3" />
             PREMIUM
           </div>
@@ -64,7 +64,8 @@ const PropertyCardPlaceholder = ({ index = 0 }) => {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold py-2.5 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 group"
+              className="w-full text-white font-semibold py-2.5 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 group"
+              style={{ backgroundColor: '#1B1B59' }}
             >
               <Eye className="w-4 h-4 group-hover:scale-110 transition-transform" />
               Sign In to View
@@ -79,7 +80,7 @@ const PropertyCardPlaceholder = ({ index = 0 }) => {
       </div>
 
       {/* Hover Glow Effect */}
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-400 to-purple-400 opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500 -z-10"></div>
+      <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500 -z-10" style={{ backgroundColor: '#1B1B59' }}></div>
 
       {/* Add shimmer animation */}
       <style jsx>{`

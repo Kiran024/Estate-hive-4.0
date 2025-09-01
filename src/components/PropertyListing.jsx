@@ -784,7 +784,7 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
       <div className="max-w-7xl mx-auto">
         {/* Tabs */}
         <div className="mb-8 flex justify-center">
-          <div className="w-full max-w-6xl rounded-xl bg-[#1C75BC14] p-1 flex gap-1 overflow-x-auto scrollbar-hide md:justify-center">
+          <div className="w-full max-w-6xl rounded-xl bg-[#1C75BC14] p-1 flex flex-wrap gap-1 justify-center">
             {TABS.map((t, i) => (
               <button
                 key={t}

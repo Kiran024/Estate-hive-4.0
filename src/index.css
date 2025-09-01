@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import 'mapbox-gl/dist/mapbox-gl.css';
-
+@import 'swiper/css';
+@import 'swiper/css/navigation';
 
 @tailwind base;
 @tailwind components;

@@ -17,7 +17,11 @@ const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [stats, setStats] = useState({ propertiesSaved: 0 });
 
-  const { hidden, isScrolled } = useHideOnScroll({ topOffset: 20, tolerance: 12 });
+  const { hidden, isScrolled, scrollProgress } = useHideOnScroll({ 
+    threshold: 50,
+    topOffset: 10,
+    tolerance: 3
+  });
   const effectivelyHidden = hidden && !isOpen;
 
   const navRef = useRef(null);
@@ -116,8 +120,22 @@ const Navbar = () => {
   };
 
   const headerVariants = {
-    show: { y: 0, opacity: 1, transition: { duration: 0.25, ease: 'easeOut' } },
-    hide: { y: '-100%', opacity: 0, transition: { duration: 0.25, ease: 'easeIn' } },
+    show: { 
+      y: 0, 
+      transition: { 
+        type: 'tween',
+        duration: 0.2,
+        ease: 'easeOut'
+      } 
+    },
+    hide: { 
+      y: '-100%', 
+      transition: { 
+        type: 'tween',
+        duration: 0.2,
+        ease: 'easeIn'
+      } 
+    },
   };
 
   const menuItems = [
@@ -142,7 +160,8 @@ const Navbar = () => {
       className="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-md"
       style={{
         pointerEvents: effectivelyHidden ? 'none' : 'auto',
-        boxShadow: (isScrolled || isOpen) ? '0 4px 12px rgba(0,0,0,0.08)' : 'none',
+        boxShadow: isScrolled ? '0 4px 12px rgba(0,0,0,0.08)' : 'none',
+        willChange: 'transform',
       }}
     >
       <div className="max-w-[1400px] mx-auto px-4 md:px-10 py-3 flex items-center justify-between">

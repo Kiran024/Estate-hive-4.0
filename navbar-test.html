@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navbar Scroll Test</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+        .test-instructions {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #4F46E5;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 300px;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .test-instructions h3 {
+            margin-top: 0;
+        }
+        .test-instructions ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .content {
+            padding: 100px 20px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .section {
+            margin-bottom: 60px;
+            padding: 40px;
+            background: #f3f4f6;
+            border-radius: 8px;
+        }
+        .section h2 {
+            color: #1f2937;
+        }
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-instructions">
+        <h3>🧪 Navbar Test Instructions</h3>
+        <p>Test the navbar functionality:</p>
+        <ul>
+            <li>✅ Scroll down slowly - navbar should hide smoothly after 60px</li>
+            <li>✅ Scroll up - navbar should appear immediately</li>
+            <li>✅ Check shadow increases with scroll</li>
+            <li>✅ Verify smooth transitions</li>
+            <li>✅ Test rapid scrolling</li>
+        </ul>
+        <p><strong>Expected behavior:</strong></p>
+        <ul>
+            <li>Hide on scroll down ⬇️</li>
+            <li>Show on scroll up ⬆️</li>
+            <li>Always visible at top</li>
+            <li>Smooth spring animations</li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <h1>Navbar Scroll Test Page</h1>
+        <p>This page helps you test the navbar hide/show functionality. <span class="highlight">The navbar should hide when you scroll down and reappear when you scroll up.</span></p>
+
+        <div class="section">
+            <h2>Section 1: Introduction</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </div>
+
+        <div class="section">
+            <h2>Section 2: Testing Area</h2>
+            <p>Continue scrolling to test the navbar behavior. The navbar should smoothly hide when scrolling down and immediately show when scrolling up.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+        </div>
+
+        <div class="section">
+            <h2>Section 3: More Content</h2>
+            <p>Keep scrolling to see the effect. Notice how the shadow and blur effect change as you scroll.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        </div>
+
+        <div class="section">
+            <h2>Section 4: Continued Testing</h2>
+            <p>The navbar should have smooth spring animations when appearing and a gentle ease-out when hiding.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+        </div>
+
+        <div class="section">
+            <h2>Section 5: Performance Check</h2>
+            <p>Even with rapid scrolling, the navbar should respond smoothly without janky movements.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        </div>
+
+        <div class="section">
+            <h2>Section 6: Final Tests</h2>
+            <p>Try scrolling to the very top - the navbar should always be visible near the top of the page.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+        </div>
+
+        <div class="section">
+            <h2>Section 7: Edge Cases</h2>
+            <p>Test edge cases like very fast scrolling, alternating scroll directions quickly, and scrolling while the navbar is transitioning.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        </div>
+
+        <div class="section">
+            <h2>Section 8: Conclusion</h2>
+            <p>If everything works correctly, you should have experienced smooth navbar transitions with proper hide/show behavior based on scroll direction.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+        </div>
+    </div>
+
+    <script>
+        // Log scroll events for debugging
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.scrollY;
+            const direction = currentScroll > lastScroll ? 'down' : 'up';
+            console.log(`Scroll ${direction}: ${currentScroll}px`);
+            lastScroll = currentScroll;
+        });
+    </script>
+</body>
+</html>

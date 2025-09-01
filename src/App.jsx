@@ -109,8 +109,8 @@ const Layout = () => {
       {/* Keep Navbar mounted across all routes for global scroll-hide */}
       {!hideNavFooter && <Navbar />}
 
-      {/* Add padding-top to avoid content sitting under fixed navbar */}
-      <main className="flex-grow pt-16 md:pt-20">
+      {/* Add padding-top to avoid content sitting under fixed navbar - except for auth page */}
+      <main className={`flex-grow ${hideNavFooter ? '' : 'pt-16 md:pt-20'}`}>
         <Suspense fallback={<div className="p-4 text-center">Loading...</div>}>
           <Routes>
             <Route path="/" element={<HomePage />} />

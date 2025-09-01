@@ -107,7 +107,7 @@ const SavedProperties = () => {
     return (
       <div className="min-h-screen bg-gray-50 pt-24 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 mx-auto" style={{ borderColor: '#1B1B59' }}></div>
           <p className="mt-4 text-gray-600">Loading your saved properties...</p>
         </div>
       </div>
@@ -152,7 +152,7 @@ const SavedProperties = () => {
                   placeholder="Search properties..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1B1B59] focus:border-transparent"
                 />
               </div>
 
@@ -160,7 +160,7 @@ const SavedProperties = () => {
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1B1B59] focus:border-transparent"
               >
                 <option value="all">All Types</option>
                 <option value="apartment">Apartment</option>
@@ -173,7 +173,7 @@ const SavedProperties = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1B1B59] focus:border-transparent"
               >
                 <option value="saved_date">Recently Saved</option>
                 <option value="price_low">Price: Low to High</option>
@@ -218,7 +218,10 @@ const SavedProperties = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigate('/properties')}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 text-white rounded-lg font-medium transition-colors hover:shadow-lg"
+                style={{ backgroundColor: '#1B1B59' }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#141452'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#1B1B59'}
               >
                 <Home className="w-4 h-4" />
                 Browse Properties
@@ -328,7 +331,7 @@ const SavedProperties = () => {
                       
                       {/* Title */}
                       <Link to={`/property/${property.id}`}>
-                        <h4 className="text-base font-semibold text-gray-800 mb-2 line-clamp-2 hover:text-blue-600">
+                        <h4 className="text-base font-semibold text-gray-800 mb-2 line-clamp-2 hover:text-[#1B1B59]">
                           {property.title || 'Untitled Property'}
                         </h4>
                       </Link>
@@ -395,7 +398,8 @@ const SavedProperties = () => {
                         </span>
                         <button
                           onClick={() => handleRemoveProperty(property.id)}
-                          className="text-xs text-red-600 hover:text-red-700 flex items-center gap-1"
+                          className="text-xs flex items-center gap-1 hover:opacity-80 transition-opacity"
+                          style={{ color: '#E53E3E' }}
                         >
                           <Trash2 className="w-3 h-3" />
                           Remove
@@ -415,7 +419,8 @@ const SavedProperties = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="mt-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-8 text-white text-center"
+            className="mt-12 rounded-2xl p-8 text-white text-center"
+            style={{ background: 'linear-gradient(135deg, #1B1B59 0%, #2D2D7A 100%)' }}
           >
             <h3 className="text-2xl font-bold mb-4">Ready to take the next step?</h3>
             <p className="text-white/90 mb-6">
@@ -426,7 +431,8 @@ const SavedProperties = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigate('/contact-us')}
-                className="px-6 py-3 bg-white text-indigo-600 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                className="px-6 py-3 bg-white rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                style={{ color: '#1B1B59' }}
               >
                 Contact Expert
               </motion.button>

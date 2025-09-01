@@ -308,8 +308,8 @@ const VerifiedExclusives = () => {
             transition={{ delay: 0.5 }}
             className="mt-12 text-center"
           >
-            <div className="inline-block bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-8 border border-indigo-100">
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+            <div className="inline-block bg-white rounded-2xl p-8 border border-gray-200 shadow-lg">
+              <h3 className="text-2xl font-bold mb-3" style={{ color: '#1B1B59' }}>
                 Unlock {listings.length - 6} More Premium Properties
               </h3>
               <p className="text-gray-600 mb-6 max-w-md mx-auto">
@@ -320,7 +320,8 @@ const VerifiedExclusives = () => {
                   onClick={() => {
                     navigate('/auth', { state: { from: location.pathname, mode: 'signin' } });
                   }}
-                  className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="px-6 py-3 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                  style={{ backgroundColor: '#1B1B59' }}
                 >
                   Sign In
                 </button>
@@ -328,7 +329,8 @@ const VerifiedExclusives = () => {
                   onClick={() => {
                     navigate('/auth', { state: { from: location.pathname, mode: 'signup' } });
                   }}
-                  className="px-6 py-3 bg-white border-2 border-gray-200 text-gray-800 font-semibold rounded-lg hover:border-gray-300 transition-all duration-300"
+                  className="px-6 py-3 bg-white font-semibold rounded-lg hover:bg-gray-50 transition-all duration-300"
+                  style={{ border: '2px solid #1B1B59', color: '#1B1B59' }}
                 >
                   Create Account
                 </button>
