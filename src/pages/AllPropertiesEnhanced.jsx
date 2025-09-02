@@ -96,6 +96,10 @@ export default function AllPropertiesEnhanced() {
       newFilters.category = params.get('category');
       hasChanges = true;
     }
+    if (params.get('subcategory')) {
+      newFilters.subcategory = params.get('subcategory');
+      hasChanges = true;
+    }
     
     if (params.get('min_price')) {
       newFilters.min_price = params.get('min_price');

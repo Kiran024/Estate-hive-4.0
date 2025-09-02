@@ -34,14 +34,20 @@ const AuthPage = () => {
     // Handle OAuth callback
     if (window.location.hash && window.location.hash.includes('access_token')) {
       authService.handleOAuthCallback().then(() => {
-        const from = localStorage.getItem('authRedirectTo') || location.state?.from || '/';
+        // After email verification or magic link: go to Sign In page
         localStorage.removeItem('authRedirectTo');
-        navigate(from);
+        navigate('/auth');
       });
     }
 
     const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
+        if (window.location.hash && window.location.hash.includes('access_token')) {
+          // Email verification or magic link: land on Sign In page
+          localStorage.removeItem('authRedirectTo');
+          navigate('/auth');
+          return;
+        }
         const from = localStorage.getItem('authRedirectTo') || location.state?.from || '/';
         localStorage.removeItem('authRedirectTo');
         navigate(from);
@@ -86,7 +92,8 @@ const AuthPage = () => {
       password,
       options: {
         data: { full_name: fullName, phone: phone },
-        emailRedirectTo: `${window.location.origin}/confirmed`,
+        // After email verify, open the Sign In (Welcome Back) page
+        emailRedirectTo: `${window.location.origin}/#/auth`,
       },
     });
 
@@ -130,7 +137,8 @@ const AuthPage = () => {
     setLoading(true);
     setMessage('');
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth-reset`,
+      // Open dedicated reset password page in the SPA
+      redirectTo: `${window.location.origin}/#/auth-reset`,
     });
     if (error) {
       setMessage(error.message);

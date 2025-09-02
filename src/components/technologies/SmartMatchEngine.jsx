@@ -2,10 +2,11 @@ import React, { useMemo, useState, useRef, useEffect } from "react";
 import { FiSliders, FiStar, FiHeart } from "react-icons/fi";
 import { Range, getTrackBackground } from "react-range";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { propertyService } from "../../services/propertyService";
 import { formatPrice } from "../../types/property.types";
+import { useAuth } from "../../contexts/AuthContext";
 
 import {
   MapPin, Bed, Bath, Car, Home, Share2, Camera, Square,
@@ -21,6 +22,9 @@ const MAX_PRICE = 250_000_000;    // ₹25 Cr
 const normalizeCity = (c) => (c === "Bangalore" ? "Bengaluru" : c);
 
 export default function SmartMatchEngine() {
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   // --- dynamic lists (match DB values) ---
   const [availableLocations, setAvailableLocations] = useState([
     "Bengaluru", "Bangalore"
@@ -31,6 +35,7 @@ export default function SmartMatchEngine() {
 
   useEffect(() => {
     // pull unique cities/types so our values exactly match DB
+    if (!user) return; // do not fetch lists until authenticated
     (async () => {
       try {
         const cities = await propertyService.getUniqueCities();
@@ -45,7 +50,7 @@ export default function SmartMatchEngine() {
         }
       } catch {}
     })();
-  }, []);
+  }, [user]);
 
   // --- form state (make “Any” the default to avoid unintentional filtering) ---
   const [propertyType, setPropertyType] = useState("all");
@@ -93,7 +98,7 @@ export default function SmartMatchEngine() {
   const { data, isFetching, error } = useQuery({
     queryKey: ["smart-match", filtersForQuery],
     queryFn: () => propertyService.getAllProperties(filtersForQuery),
-    enabled: !!filtersForQuery,
+    enabled: !!user && !!filtersForQuery,
     keepPreviousData: true,
     staleTime: 5 * 60 * 1000,
   });
@@ -103,6 +108,10 @@ export default function SmartMatchEngine() {
 
   const onSubmit = (e) => {
     e.preventDefault();
+    if (!user) {
+      navigate('/auth', { state: { from: location.pathname } });
+      return;
+    }
     setQueryFilters({
       propertyType,
       priceRange,
@@ -248,6 +257,21 @@ export default function SmartMatchEngine() {
             <p className="text-gray-600 text-lg md:text-xl mb-2">Tell us about your preferences and investment goals.</p>
             <p className="text-gray-600 text-base md:text-lg">Our AI-powered engine will analyze thousands of properties to find your ideal matches.</p>
           </div>
+
+          {/* Unauthenticated prompt */}
+          {!user && !authLoading && (
+            <div className="max-w-2xl mx-auto mb-8">
+              <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg p-4">
+                <p className="mb-3 font-medium">Please log in to find your property matches.</p>
+                <button
+                  onClick={() => navigate('/auth', { state: { from: location.pathname } })}
+                  className="bg-[#040449] hover:bg-[#06066a] text-white font-semibold px-6 py-3 rounded-full"
+                >
+                  Go to Login
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="bg-neutral-100 rounded-3xl shadow-[8px_8px_16px_#bebebe,-8px_-8px_16px_#ffffff] p-6 sm:p-8 md:p-10 lg:p-12 max-w-4xl mx-auto">
             <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 text-left">
@@ -403,14 +427,14 @@ export default function SmartMatchEngine() {
 
           {/* RESULTS */}
           <div ref={resultsRef} className="max-w-6xl mx-auto mt-10 md:mt-14 text-left">
-            {isFetching && (
+            {isFetching && user && (
               <div className="flex items-center justify-center py-16">
                 <Loader2 className="w-7 h-7 animate-spin text-blue-600" />
                 <span className="ml-2 text-gray-600">Fetching properties…</span>
               </div>
             )}
 
-            {error && (
+            {error && user && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
                 <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
                 <div>
@@ -420,7 +444,7 @@ export default function SmartMatchEngine() {
               </div>
             )}
 
-            {!!filtersForQuery && !isFetching && !error && (
+            {!!user && !!filtersForQuery && !isFetching && !error && (
               <>
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-gray-700">

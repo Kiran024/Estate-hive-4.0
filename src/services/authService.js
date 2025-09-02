@@ -7,7 +7,8 @@ export const authService = {
       email,
       password,
       options: {
-        data: metadata
+        data: metadata,
+        emailRedirectTo: `${window.location.origin}/#/auth`
       }
     });
     
@@ -60,7 +61,7 @@ export const authService = {
   // Reset password
   async resetPassword(email) {
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth-reset`
+      redirectTo: `${window.location.origin}/#/auth-reset`
     });
     
     if (error) throw error;

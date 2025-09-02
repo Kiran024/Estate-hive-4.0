@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../util/supabaseClient';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const supabaseUrl = 'https://qfmglenbyvhfrydozzqp.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmbWdsZW5ieXZoZnJ5ZG96enFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI3Nzc1MTksImV4cCI6MjA2ODM1MzUxOX0.KgiS9wmPVCnGCxYxLE2wSKRgwYwXvLU-j8UtIpmDUfQ'; 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -19,6 +15,11 @@ const ResetPassword = () => {
     setError('');
     setLoading(true);
 
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      setLoading(false);
+      return;
+    }
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       setLoading(false);
@@ -31,7 +32,7 @@ const ResetPassword = () => {
       setError(updateError.message);
     } else {
       setSuccess(true);
-      setTimeout(() => navigate('/'), 3000);
+      setTimeout(() => navigate('/auth'), 2000);
     }
 
     setLoading(false);
@@ -49,10 +50,10 @@ const ResetPassword = () => {
               animate={{ y: 0, opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.6 }}
-              className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-green-100 text-green-800 border border-green-400 px-5 py-3 rounded-lg shadow-md z-20 text-center"
+              className="absolute top-4 left-1/2 -translate-x-1/2 bg-green-100 text-green-800 border border-green-400 px-5 py-3 rounded-lg shadow-md z-20 text-center"
             >
-              🎉 <strong>Login Successful!</strong><br />
-              Redirecting to homepage...
+              <strong>Password Updated!</strong>
+              <br />Redirecting to Sign In...
             </motion.div>
           )}
         </AnimatePresence>
@@ -78,7 +79,7 @@ const ResetPassword = () => {
         <button
           onClick={handleResetPassword}
           disabled={loading}
-          className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition flex justify-center items-center"
+          className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition flex justify-center items-center disabled:opacity-60"
         >
           {loading ? (
             <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
