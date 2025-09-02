@@ -838,14 +838,11 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
               onSlideChange={(s) => setPageIndex(Math.floor(s.activeIndex / perView))}
               className="pb-2"
             >
-              {items.map((it, idx) => {
-                const originalIndex = data.findIndex((d) => d.id === it.id);
-                return (
-                  <SwiperSlide key={`${it.id}-${idx}`}>
-                    <Card item={it} index={idx} dataIndex={originalIndex} onPropertyClick={onPropertyClick} />
-                  </SwiperSlide>
-                );
-              })}
+              {items.map((it, idx) => (
+                <SwiperSlide key={`${it.id}-${idx}`}>
+                  <Card item={it} index={idx} onPropertyClick={onPropertyClick} />
+                </SwiperSlide>
+              ))}
             </Swiper>
             
             <div className="md:hidden mt-6 flex justify-center gap-6">
@@ -868,7 +865,7 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
 }
 
 // Card component - UPDATED
-function Card({ item, index, onPropertyClick, dataIndex }) {
+function Card({ item, index, onPropertyClick }) {
   const { id, title, image, location, type, area, price } = item;
   const imgFirst = index % 2 === 0;
 
@@ -906,7 +903,7 @@ function Card({ item, index, onPropertyClick, dataIndex }) {
         {/* Use onPropertyClick if provided, otherwise direct navigation */}
         {onPropertyClick ? (
           <button
-            onClick={(e) => onPropertyClick((Number.isInteger(dataIndex) && dataIndex >= 0) ? dataIndex : index, e)}
+            onClick={(e) => onPropertyClick(index, e)}
             className="rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white shadow transition-colors hover:bg-red-700"
           >
             View Details

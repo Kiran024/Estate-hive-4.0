@@ -1,0 +1,45 @@
+﻿01e7910 | 2025-09-02 21:20:50 +0530 | Kiran024 | UpdateJSXFiles
+b736e4f | 2025-09-01 23:27:39 +0530 | Kiran024 | Update features: Mobile view, Filtering of SmartMatchEngine
+9e6b0fd | 2025-09-01 11:03:38 +0530 | Mahesh Kumar Kamalakar | Revert AuthPage to classic card flip design with professional enhancements
+8737e68 | 2025-09-01 10:24:07 +0530 | Mahesh Kumar Kamalakar | refactor: Clean up authentication components and improve code organization
+ba069aa | 2025-08-30 14:15:17 +0530 | Mahesh Kumar Kamalakar | feat: Complete Estate Hive frontend implementation with authentication and wishlist
+016d905 | 2025-08-29 14:12:03 +0530 | Mahesh Kumar Kamalakar | docs: Add comprehensive README with project documentation
+0fedcd9 | 2025-08-29 13:48:57 +0530 | Mahesh Kumar Kamalakar | feat: Add comprehensive authentication and access control system
+b3fab35 | 2025-08-29 12:42:10 +0530 | Kiran Guttedar | Merge pull request #2 from Kiran024/main
+21c8e56 | 2025-08-29 12:23:53 +0530 | Kiran024 | Button navigated to sign up page
+9bb5ae4 | 2025-08-25 18:37:04 +0530 | Mahesh Kumar Kamalakar | Merge pull request #1 from Kiran024/main
+7937863 | 2025-08-25 18:22:27 +0530 | Mahesh Kumar Kamalakar | Update property components with enhanced database integration
+412938f | 2025-08-25 18:21:57 +0530 | Mahesh Kumar Kamalakar | Enhance Estate Hive with improved scroll behavior, navbar fixes, and advanced property system
+ccfd2bd | 2025-08-22 16:41:23 +0530 | Kiran024 | updated of view detail button
+9f602a0 | 2025-08-19 12:44:28 +0530 | Kiran024 | Mapbox API integration for location of property
+df2fc98 | 2025-08-16 16:56:52 +0530 | Kiran024 | Updated code with new features1
+36ac12b | 2025-08-16 14:16:28 +0530 | Kiran024 | Updated code with new features
+21d67d9 | 2025-08-11 18:56:01 +0530 | Mahesh Kumar Kamalakar | Merge pull request #17 from maverickprofile/codex/resolve-merge-conflict-in-allproperties.jsx
+094ed12 | 2025-08-11 18:55:46 +0530 | Mahesh Kumar Kamalakar | refactor: use custom select component on properties page
+fe2473c | 2025-08-11 18:37:05 +0530 | Mahesh Kumar Kamalakar | Merge pull request #15 from maverickprofile/codex/improve-properties-page-ui-and-layout
+b47e83f | 2025-08-11 18:36:22 +0530 | Mahesh Kumar Kamalakar | style: improve all properties layout
+baf9ebc | 2025-08-11 15:31:17 +0530 | Mahesh Kumar Kamalakar | Merge pull request #14 from maverickprofile/codex/fix-fetching-issue-for-listings
+e49f8a5 | 2025-08-11 15:30:59 +0530 | Mahesh Kumar Kamalakar | Handle empty listing data
+796a5bd | 2025-08-11 11:46:02 +0530 | Mahesh Kumar Kamalakar | Merge pull request #12 from maverickprofile/codex/resolve-merge-conflicts-in-properties.js
+637bac8 | 2025-08-11 11:44:02 +0530 | Mahesh Kumar Kamalakar | Resolve merge conflicts and clean up
+c1504e4 | 2025-08-11 11:14:45 +0530 | Mahesh Kumar Kamalakar | Merge pull request #10 from maverickprofile/codex/resolve-merge-conflicts-in-code-files
+ae06feb | 2025-08-11 11:14:01 +0530 | Mahesh Kumar Kamalakar | Resolve merge conflicts for property listings
+1111950 | 2025-08-10 23:42:00 +0530 | Mahesh Kumar Kamalakar | Merge pull request #8 from maverickprofile/codex/add-hardcoded-property-listings-to-frontend
+a538882 | 2025-08-10 23:41:23 +0530 | Mahesh Kumar Kamalakar | feat: add static property listings and browse page
+b7796d8 | 2025-08-09 14:07:07 +0530 | Mahesh Kumar Kamalakar | Merge pull request #7 from maverickprofile/codex/resolve-conflicts-in-verifiedexclusives.jsx
+6441173 | 2025-08-09 14:06:21 +0530 | Mahesh Kumar Kamalakar | fix: resolve conflicts in VerifiedExclusives
+7b6cc8c | 2025-08-09 13:42:25 +0530 | Mahesh Kumar Kamalakar | Merge pull request #5 from maverickprofile/codex/fetch-real-time-property-listings-from-supabase
+86b1431 | 2025-08-09 13:41:10 +0530 | Mahesh Kumar Kamalakar | Fetch property listings from Supabase
+71cb10e | 2025-08-09 13:28:58 +0530 | Mahesh Kumar Kamalakar | Merge pull request #4 from maverickprofile/codex/refactor-homepage.jsx-into-separate-components
+2b3f953 | 2025-08-09 13:26:48 +0530 | Mahesh Kumar Kamalakar | refactor homepage into separate components
+49c1f66 | 2025-08-09 13:13:21 +0530 | Mahesh Kumar Kamalakar | Merge pull request #3 from maverickprofile/codex/resolve-merge-conflict-in-app.jsx
+7f1f670 | 2025-08-09 13:12:22 +0530 | Mahesh Kumar Kamalakar | Use HashRouter in App
+9ddaf21 | 2025-08-09 12:53:40 +0530 | Mahesh Kumar Kamalakar | Merge pull request #1 from maverickprofile/codex/review-estate-hive-frontend-repository
+80716b7 | 2025-08-09 12:47:20 +0530 | Mahesh Kumar Kamalakar | feat: lazy load route components
+8573d5e | 2025-08-07 17:12:57 +0530 | Kiran024 | Updated Estate Hive project with new features
+1628ab7 | 2025-07-18 13:25:44 +0530 | Mahesh Kumar Kamalakar | Merge pull request #1 from maverickprofile/master
+abd1289 | 2025-07-18 12:26:05 +0530 | maverickprofile | initial commit
+1efaf58 | 2025-07-18 11:34:32 +0530 | maverickprofile | updated version 1.0
+f080448 | 2025-07-11 18:45:50 +0530 | maverickprofile | added chnages
+462bf72 | 2025-07-11 18:30:04 +0530 | maverickprofile | initial commit
+26f668b | 2025-07-11 18:26:30 +0530 | Mahesh Kumar Kamalakar | Initial commit

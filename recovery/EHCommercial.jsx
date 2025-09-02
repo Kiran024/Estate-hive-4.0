@@ -1,15 +1,10 @@
-import React, { useState,useRef, useEffect } from 'react';
+import React, { useState,useRef } from 'react';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'; // Import for carousel navigation
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { propertyService } from '../../services/propertyService';
-import { formatPrice } from '../../types/property.types';
-import WishlistButton from '../common/WishlistButton';
 
 const fadeInVariants = {
   hidden: { opacity: 0, y: 50 },
@@ -20,38 +15,6 @@ const fadeInVariants = {
   }
 };
 function EHCommercial() {
-  // Live EH Commercial listings
-  const [commercialListings, setCommercialListings] = useState([]);
-  const [listingsLoading, setListingsLoading] = useState(false);
-  const navigate = useNavigate();
-  const { user } = useAuth();
-
-  const goToCommercialList = () => {
-    const target = `/properties?subcategory=eh_commercial`;
-    if (user) {
-      navigate(target);
-    } else {
-      navigate('/auth', {
-        state: {
-          error: 'Please sign in to view EH Commercial properties',
-          from: target,
-        },
-      });
-    }
-  };
-  const onViewDetails = (id) => {
-    const target = `/property/${id}`;
-    if (user) {
-      navigate(target);
-    } else {
-      navigate('/auth', {
-        state: {
-          error: 'Please sign in to view property details',
-          from: target,
-        },
-      });
-    }
-  };
   const propertyTypes = [
     {
       name: 'Office Spaces',
@@ -87,49 +50,6 @@ function EHCommercial() {
       ],
     },
   ];
-
-  useEffect(() => {
-    let mounted = true;
-    const load = async () => {
-      try {
-        setListingsLoading(true);
-        const { data } = await propertyService.getAllProperties({
-          status: 'active',
-          subcategory: 'eh_commercial',
-          sortBy: 'created_at',
-          sortOrder: 'desc',
-          pageSize: 12,
-        });
-        if (mounted) setCommercialListings(Array.isArray(data) ? data : []);
-      } catch (err) {
-        if (mounted) setCommercialListings([]);
-      } finally {
-        if (mounted) setListingsLoading(false);
-      }
-    };
-    load();
-    return () => { mounted = false; };
-  }, []);
-
-  const toCard = (p = {}) => ({
-    id: p.id,
-    image: (p.image_urls && p.image_urls[0]) || '/h01@300x-100.jpg',
-    title: p.title || 'Commercial Property',
-    location: p.neighborhood || p.city || '',
-    area: p.area_sqft ? `${p.area_sqft} sq ft` : '',
-    bhk: p.bedrooms ? `${p.bedrooms}` : '',
-    price: formatPrice(p.price || p.rent_amount || 0),
-    is_verified: !!p.is_verified,
-  });
-
-  const shortINR = (n) => {
-    const x = Number(n) || 0;
-    const trim = (v) => v.toFixed(1).replace(/\.0$/, '');
-    if (x >= 1e7) return `${trim(x / 1e7)} Cr`;
-    if (x >= 1e5) return `${trim(x / 1e5)} L`;
-    if (x >= 1e3) return `${trim(x / 1e3)}K`;
-    return `${x}`;
-  };
 
   // Dummy data for Featured Commercial Properties
   const featuredCommercialProperties = [
@@ -429,55 +349,24 @@ function EHCommercial() {
         }}
         className="mySwiper listings-swiper pb-8 px-1 sm:px-4"
       >
-        {commercialListings.map((prop, index) => {
+        {featuredCommercialProperties.map((listing, index) => {
           const isImageTop = index % 2 === 0;
-          const listing = toCard(prop);
-          const typeLabel = prop.property_type || (listing.bhk ? `${listing.bhk} BHK` : '');
-          const priceLabel =
-            prop?.rent_amount
-              ? `${shortINR(prop.rent_amount)}/${(prop.rent_frequency || 'month').toLowerCase()}`
-              : listing.price;
           return (
-            <SwiperSlide key={prop.id}>
+            <SwiperSlide key={listing.id}>
               <div className="flex justify-center">
                 <motion.div
                   initial={{ opacity: 0, y: 50 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, ease: 'easeOut' }}
-                  className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 ease-in-out flex flex-col justify-between w-[90%] md:w-full"
+                  className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 ease-in-out flex flex-col justify-between w-[90%] md:w-full h-[500px]"
                 >
                   {isImageTop && (
-                    <div className="relative w-full h-[240px] md:h-[250px] lg:h-[260px] bg-gray-100 overflow-hidden">
+                    <div className="relative w-full h-80 overflow-hidden">
                       <img
                         src={listing.image}
                         alt={listing.title}
-                        className="absolute inset-0 h-full w-full object-cover"
-                        onError={(e) => { e.currentTarget.src = '/h01@300x-100.jpg'; }}
+                        className="w-full h-full object-cover transition-transform duration-500"
                       />
-                      <div className="absolute top-3 right-3 z-10">
-                        <WishlistButton propertyId={prop.id} variant="floating" size="md" />
-                      </div>
-                      {listing.is_verified && (
-                        <span className="absolute top-3 left-3 bg-emerald-600 text-white text-xs font-semibold px-3 py-1 rounded-[12px] shadow">
-                          Verified
-                        </span>
-                      )}
-                      <div className="absolute top-3 right-3 z-10">
-                        <WishlistButton propertyId={prop.id} variant="floating" size="md" />
-                      </div>
-                      {listing.is_verified && (
-                        <span className="absolute top-3 left-3 bg-emerald-600 text-white text-xs font-semibold px-3 py-1 rounded-[12px] shadow">
-                          Verified
-                        </span>
-                      )}
-                      <div className="absolute top-3 right-3 z-10">
-                        <WishlistButton propertyId={prop.id} variant="floating" size="md" />
-                      </div>
-                      {listing.is_verified && (
-                        <span className="absolute top-3 left-3 bg-emerald-600 text-white text-xs font-semibold px-3 py-1 rounded-[12px] shadow">
-                          Verified
-                        </span>
-                      )}
                       {listing.badge && (
                         <span className="absolute top-3 left-3 bg-red-600 text-white text-xs font-semibold px-3 py-1 rounded-[12px] shadow">
                           <span style={{ fontFamily: "'Exo 2', sans-serif" }}>
@@ -491,33 +380,37 @@ function EHCommercial() {
                     </div>
                   )}
 
-                  <div className="flex flex-col gap-2 p-4 lg:p-5 text-left">
-                    <h3 className="text-lg md:text-xl font-semibold text-gray-900 leading-snug">{listing.title}</h3>
-                    <div className="text-sm text-gray-600">{listing.location}</div>
-                    <div className="mt-1 grid grid-cols-2 gap-2 text-sm text-gray-500">
-                      <span className="truncate">{listing.area}</span>
-                      <span className="text-right">{typeLabel}</span>
-                    </div>
-                    <div className="mt-3 flex items-center justify-between">
-                      <div className="text-2xl font-bold text-gray-900">{priceLabel}</div>
-                      <button
-                        onClick={() => onViewDetails(prop.id)}
-                        className="rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white shadow transition-colors hover:bg-red-700"
-                        aria-label="View property details"
-                      >
-                        View Details
-                      </button>
-                    </div>
-                  </div>
+                  <div className="p-4 flex flex-col justify-between flex-grow text-left">
+  <div>
+    <h3 className="font-bold text-xl text-gray-900 mb-1">
+      {listing.title}
+    </h3>
+    <p className="text-md text-gray-600 mb-2">
+      {listing.location}
+    </p>
+    <div className="flex grid-col-2 gap-60 text-md text-gray-500 mb-1">
+      {/* Stack vertically if needed or align left */}
+      <span>{listing.area}</span>
+      {listing.bhk && <span>{listing.bhk}</span>}
+    </div>
+  </div>
+  <div className="flex justify-between items-center mt-auto">
+    <span className="font-bold text-[30px] text-black">
+      {listing.price}
+    </span>
+    <button className="bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-full shadow hover:bg-red-700 transition">
+      View Details
+    </button>
+  </div>
+</div>
 
 
                   {!isImageTop && (
-                    <div className="relative w-full h-[240px] md:h-[250px] lg:h-[260px] bg-gray-100 overflow-hidden">
+                    <div className="relative w-full h-80 overflow-hidden">
                       <img
                         src={listing.image}
                         alt={listing.title}
-                        className="absolute inset-0 h-full w-full object-cover"
-                        onError={(e) => { e.currentTarget.src = '/h01@300x-100.jpg'; }}
+                        className="w-full h-full object-cover transition-transform duration-500"
                       />
                       {listing.badge && (
                         <span className="absolute top-3 left-3 bg-red-600 text-white text-xs font-semibold px-3 py-1 rounded-[12px] shadow">
@@ -569,16 +462,13 @@ function EHCommercial() {
 
     {/* CTA Button */}
     <div className="mt-16 text-center">
-      <motion.button
-        onClick={() => goToCommercialList()}
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: 'easeOut' }}
-        viewport={{ once: true }}
-        className="bg-red-600 hover:bg-red-700 text-white font-semibold text-lg px-10 py-4 rounded-full shadow-lg hover:shadow-xl transition duration-300 ease-in-out w-full md:w-auto"
-        aria-label="View EH Commercial properties"
-      >
-        View EH Commercial Properties
+                      <motion.button
+                          initial={{ opacity: 0, y: 40 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.8, ease: 'easeOut' }}
+                          viewport={{ once: true }}
+                          className="bg-red-600 hover:bg-red-700 text-white font-semibold text-lg px-10 py-4 rounded-full shadow-lg hover:shadow-xl transition duration-300 ease-in-out w-full md:w-auto">
+        View All Commercial Properties
       </motion.button>
     </div>
   </div>
