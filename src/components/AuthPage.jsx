@@ -62,23 +62,28 @@ const AuthPage = () => {
     setMessage('');
     setSuccess(false);
 
-    const { error, data } = await supabase.auth.signInWithPassword({ email, password });
-
-    if (error) {
-      setMessage(error.message);
-      setLoading(false);
-    } else {
+    try {
+      await authService.signIn(email, password);
       setMessage('Signed in successfully!');
       setSuccess(true);
       setTimeout(() => {
         navigate('/');
-      }, 2000);
+      }, 1200);
+    } catch (err) {
+      const msg = (err?.message || '').toLowerCase();
+      if (msg.includes('not confirmed') || msg.includes('confirm')) {
+        try { await authService.resendSignup(email); } catch {}
+        setMessage('Please confirm your email. We resent the confirmation link.');
+      } else {
+        setMessage(err?.message || 'Invalid login credentials');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    
     if (!termsAccepted) {
       setMessage('Please accept the Terms of Service and Privacy Policy');
       return;
@@ -86,30 +91,34 @@ const AuthPage = () => {
 
     setLoading(true);
     setMessage('');
-    
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName, phone: phone },
-        // After email verify, open the Sign In (Welcome Back) page
-        emailRedirectTo: `${window.location.origin}/#/auth`,
-      },
-    });
+    setSuccess(false);
 
-    if (error) {
-      setMessage(error.message);
-    } else {
-      setMessage('Account created! Please check your email to confirm.');
-      setSuccess(true);
-      // Clear form
-      setEmail('');
-      setPassword('');
-      setFullName('');
-      setPhone('');
-      setTermsAccepted(false);
+    try {
+      const data = await authService.signUp(email, password, { full_name: fullName, phone });
+
+      // If email confirmations are disabled, Supabase returns a session; sign in directly
+      if (data?.session) {
+        setSuccess(true);
+        setMessage('Account created! Signing you in...');
+        setTimeout(() => navigate('/'), 1200);
+      } else {
+        // Ensure a confirmation email goes out (resend acts as a safety net)
+        try { await authService.resendSignup(email); } catch {}
+        setSuccess(true);
+        setMessage('Account created! Please check your email to confirm.');
+        // Clear form
+        setEmail('');
+        setPassword('');
+        setFullName('');
+        setPhone('');
+        setTermsAccepted(false);
+      }
+    } catch (err) {
+      setSuccess(false);
+      setMessage(err?.message || 'Sign up failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleGoogleSignIn = async () => {

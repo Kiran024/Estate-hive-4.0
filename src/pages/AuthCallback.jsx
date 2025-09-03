@@ -9,13 +9,21 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Get the session from the URL hash
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        // Robustly parse tokens from nested hash when using HashRouter
+        // e.g. "#/auth/callback#access_token=...&refresh_token=..."
+        const fullHash = window.location.hash || '';
+        const lastHashIndex = fullHash.lastIndexOf('#');
+        const fragment = lastHashIndex >= 0 ? fullHash.substring(lastHashIndex + 1) : '';
+        const hashParams = new URLSearchParams(fragment);
         const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
         
         if (accessToken) {
-          // Exchange the access token for a session
-          const { data, error } = await supabase.auth.getSession();
+          // Set the session explicitly to handle nested-hash cases
+          const { data, error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken || ''
+          });
           
           if (error) {
             console.error('Error getting session:', error);
@@ -23,7 +31,7 @@ const AuthCallback = () => {
             return;
           }
 
-          if (data.session) {
+          if (data?.session) {
             // Successfully authenticated
             // Check if there's a redirect path stored
             const redirectTo = localStorage.getItem('authRedirectTo') || '/';
@@ -37,11 +45,11 @@ const AuthCallback = () => {
           }
         } else {
           // No access token in URL, check if we have an error
-          const error = hashParams.get('error');
+          const err = hashParams.get('error');
           const errorDescription = hashParams.get('error_description');
           
-          if (error) {
-            console.error('OAuth error:', error, errorDescription);
+          if (err) {
+            console.error('OAuth error:', err, errorDescription);
             navigate('/auth', { 
               state: { 
                 error: errorDescription || 'Authentication failed. Please try again.' 

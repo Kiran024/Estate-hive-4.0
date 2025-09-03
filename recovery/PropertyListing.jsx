@@ -735,12 +735,21 @@ const getPerView = () => {
 };
 
 export default function PropertyListing({ listings, onPropertyClick, showLoginPrompt }) {
+  // Treat presence of a login prompt handler or explicit truthy flag as "unauthorized"
+  const isUnauthorized = !!showLoginPrompt || !!onPropertyClick;
+
+  // Normalize data from provided listings (if any) for general use
   const sourceData = (Array.isArray(listings) && listings.length > 0) ? listings : properties;
   const data = useMemo(() => sourceData.map(normalize), [sourceData]);
+
+  // Also normalize full catalog (from local properties file) for curated previews
+  const fullData = useMemo(() => properties.map(normalize), []);
 
   const [activeTab, setActiveTab] = useState(0);
   const [perView, setPerView] = useState(getPerView());
   const [pageIndex, setPageIndex] = useState(0);
+  // Track whether we've already navigated once to the second page (to gate the premium prompt)
+  const [navigations, setNavigations] = useState(0);
   const swiperRef = useRef(null);
 
   useEffect(() => {
@@ -749,18 +758,58 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
+  // Curated initial 6 for unauthorized users under "For Sale"
+  const curatedTitles = [
+    "Brigade Eternia",
+    "L&T Elara Celestia",
+    "Barca At Godrej MSR City",
+    "Surya Valencia",
+    "Elegant Takt Tropical Symphony",
+    "Assetz Sora and Saki",
+  ];
+
+  // Unauthorized state for For Sale tab
+  const isForSaleUnauthorized = isUnauthorized && activeTab === 0;
+
   const items = useMemo(() => {
     const want = TABS[activeTab].toLowerCase();
-    return data.filter((p) => p.categoryNormalized === want);
-  }, [data, activeTab]);
 
-  const totalPages = Math.max(1, Math.ceil(items.length / perView));
+    // For the "For Sale" tab, show curated 6 ONLY when unauthorized
+    if (isForSaleUnauthorized) {
+      const forSaleAll = fullData.filter((p) => p.categoryNormalized === "for sale");
+      const curatedMap = new Map(forSaleAll.map((p) => [p.title, p]));
+      const curated = curatedTitles
+        .map((t) => curatedMap.get(t))
+        .filter(Boolean);
+      const usedIds = new Set(curated.map((p) => p.id));
+      const remaining = forSaleAll.filter((p) => !usedIds.has(p.id));
+      const initialSix = curated.length >= 6
+        ? curated.slice(0, 6)
+        : [...curated, ...remaining].slice(0, 6);
+      return initialSix;
+    }
+
+    // Other tabs: filter normally
+    return data.filter((p) => p.categoryNormalized === want);
+  }, [activeTab, data, fullData, isForSaleUnauthorized]);
+
+  // Effective per-view/group: show 3-at-a-time for unauthorized For Sale
+  const effectivePerView = isForSaleUnauthorized ? 3 : perView;
+  const effectiveGroup = isForSaleUnauthorized ? 3 : perView;
+
+  const totalPages = Math.max(1, Math.ceil(items.length / effectivePerView));
+  const gap = isForSaleUnauthorized ? 12 : 20; // tighter gap so 3 cards fit comfortably (only unauthorized)
 
   useEffect(() => {
     setPageIndex(0);
     const s = swiperRef.current?.swiper;
     if (s) s.slideTo(0, 0);
   }, [activeTab, perView]);
+
+  // Reset navigation count when tab changes or page resets
+  useEffect(() => {
+    setNavigations(0);
+  }, [activeTab]);
 
   const goPrev = () => {
     if (pageIndex > 0) {
@@ -772,6 +821,29 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
   };
 
   const goNext = () => {
+    // Special behavior for unauthorized users on "For Sale"
+    if (isForSaleUnauthorized) {
+      if (pageIndex < totalPages - 1) {
+        swiperRef.current?.swiper.slideNext();
+        setNavigations((n) => n + 1);
+        return;
+      }
+      // Already on last page; if this is the second click, show prompt
+      if (navigations >= 1) {
+        const message = "Unlock 38 More Premium Properties";
+        if (typeof showLoginPrompt === "function") {
+          try { showLoginPrompt(message); } catch (_) { /* no-op */ }
+        } else {
+          // eslint-disable-next-line no-alert
+          window.alert(message);
+        }
+        return;
+      }
+      // Guard: if somehow we are on last page without recorded navigation, record and do nothing
+      setNavigations((n) => n + 1);
+      return;
+    }
+
     if (pageIndex < totalPages - 1) {
       swiperRef.current?.swiper.slideNext();
       return;
@@ -829,18 +901,28 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
               </svg>
             </button>
 
+            {/* Configure breakpoints so mobile remains readable */}
             <Swiper
               ref={swiperRef}
               modules={[Navigation]}
-              slidesPerView={perView}
-              slidesPerGroup={perView}
-              spaceBetween={20}
-              onSlideChange={(s) => setPageIndex(Math.floor(s.activeIndex / perView))}
+              slidesPerView={effectivePerView}
+              slidesPerGroup={effectiveGroup}
+              breakpoints={isForSaleUnauthorized ? {
+                0: { slidesPerView: 3, slidesPerGroup: 3, spaceBetween: 10 },
+                640: { slidesPerView: 3, slidesPerGroup: 3, spaceBetween: 12 },
+                768: { slidesPerView: 3, slidesPerGroup: 3, spaceBetween: 12 },
+              } : {
+                0: { slidesPerView: 1, slidesPerGroup: 1 },
+                768: { slidesPerView: 2, slidesPerGroup: 2 },
+                1024: { slidesPerView: 3, slidesPerGroup: 3 },
+              }}
+              spaceBetween={gap}
+              onSlideChange={(s) => setPageIndex(Math.floor(s.activeIndex / effectivePerView))}
               className="pb-2"
             >
               {items.map((it, idx) => (
                 <SwiperSlide key={`${it.id}-${idx}`}>
-                  <Card item={it} index={idx} onPropertyClick={onPropertyClick} />
+                  <Card item={it} index={idx} onPropertyClick={onPropertyClick} compact={isForSaleUnauthorized} />
                 </SwiperSlide>
               ))}
             </Swiper>
@@ -865,12 +947,16 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
 }
 
 // Card component - UPDATED
-function Card({ item, index, onPropertyClick }) {
+function Card({ item, index, onPropertyClick, compact = false }) {
   const { id, title, image, location, type, area, price } = item;
   const imgFirst = index % 2 === 0;
+  const imageHeights = compact
+    ? "h-[180px] md:h-[190px] lg:h-[200px]"
+    : "h-[240px] md:h-[250px] lg:h-[260px]";
+  const cardMinH = compact ? "min-h-[340px]" : "min-h-[400px]";
 
   const ImageBlock = (
-    <div className="relative w-full h-[240px] md:h-[250px] lg:h-[260px] bg-gray-100">
+    <div className={`relative w-full ${imageHeights} bg-gray-100`}>
       <img
         src={image || PLACEHOLDER}
         alt={title }
@@ -922,7 +1008,7 @@ function Card({ item, index, onPropertyClick }) {
 
   return (
     <div className="h-full w-full">
-      <div className="flex h-full min-h-[400px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow duration-300 hover:shadow-xl">
+      <div className={`flex h-full ${cardMinH} flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow duration-300 hover:shadow-xl`}>
         {imgFirst ? (
           <>
             {ImageBlock}

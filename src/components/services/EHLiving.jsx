@@ -1,12 +1,19 @@
 // EHLiving.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { FiChevronDown, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { propertyService } from '../../services/propertyService';
+import WishlistButton from '../common/WishlistButton';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 
 function EHLiving() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
   // ===== Owners features (unchanged) =====
   const ownerFeatures = [
     {
@@ -77,6 +84,43 @@ function EHLiving() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // ===== Fetch EH Verified properties from Supabase (CRM) =====
+  const [ehVerified, setEhVerified] = useState([]);
+  const [loadingProps, setLoadingProps] = useState(true);
+  const [propsError, setPropsError] = useState('');
+
+  useEffect(() => {
+    const fetchEhVerified = async () => {
+      try {
+        setPropsError('');
+        setLoadingProps(true);
+        const { data, error } = await propertyService.getAllProperties({
+          status: 'active',
+          subcategory: 'eh_verified',
+          sortBy: 'created_at',
+          sortOrder: 'desc',
+          pageSize: 24
+        });
+        if (error) throw new Error(error);
+        setEhVerified(data || []);
+      } catch (err) {
+        setPropsError(err.message || 'Failed to load properties');
+        setEhVerified([]);
+      } finally {
+        setLoadingProps(false);
+      }
+    };
+    fetchEhVerified();
+  }, []);
+
+  const requireAuth = () => {
+    if (!user) {
+      navigate('/auth', { state: { from: location.pathname } });
+      return false;
+    }
+    return true;
+  };
+
   // ===== Available properties =====
   // TIP: add imageHd: '/path/to/1920x1080.jpg' for crisp 1080p
   const availableProperties = [
@@ -133,6 +177,23 @@ function EHLiving() {
       area: '2,000 sq ft',
     },
   ];
+
+  // When EH Verified results exist, map them into the card shape
+  const availablePropertiesData = ehVerified.length
+    ? ehVerified.map((p) => ({
+        id: p.id,
+        image: p.image_urls?.[0] || p.featured_image || '/h01@300x-100.jpg',
+        imageHd: null,
+        verified: p.subcategory === 'eh_verified',
+        title: p.title || 'Untitled Property',
+        location: [p.neighborhood, p.city].filter(Boolean).join(', '),
+        price: p.price || p.rent_amount || '',
+        deposit: p.deposit_amount || '',
+        beds: p.bedrooms != null ? `${p.bedrooms} Bed` : '',
+        baths: p.bathrooms != null ? `${p.bathrooms} Bath` : '',
+        area: p.area_sqft ? `${p.area_sqft} sq ft` : ''
+      }))
+    : availableProperties;
 
   return (
     <>
@@ -355,33 +416,23 @@ function EHLiving() {
               }}
               className="pb-0"
             >
-              {availableProperties.map((property, idx) => {
+              {availablePropertiesData.map((property, idx) => {
                 const reverse = idx % 2 === 1; // 2nd, 4th, ... => text on top, image bottom
                 return (
                   <SwiperSlide key={property.id}>
                     <article
                       className={`
-                        group bg-white border border-gray-200 rounded-xl shadow-sm
-                        hover:shadow-lg transition-all duration-300 ease-in-out
+                        bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden
                         h-full flex ${reverse ? 'flex-col-reverse' : 'flex-col'}
                       `}
                     >
                       {/* IMAGE block (kept separate; flex order controlled by container) */}
-                      <figure className="relative w-full">
+                      <figure className="relative h-56 overflow-hidden bg-gray-200">
                         <img
                           src={property.image}
-                          srcSet={
-                            property.imageHd
-                              ? `${property.image} 1x, ${property.imageHd} 2x`
-                              : undefined
-                          }
-                          sizes="(min-width:1024px) 33vw, (min-width:768px) 50vw, 100vw"
-                          width={1920}
-                          height={1080}
-                          decoding="async"
                           loading={idx < 2 ? 'eager' : 'lazy'}
                           alt={property.title}
-                          className="w-full aspect-[16/9] object-cover transition-transform duration-500 group-hover:scale-[1.01]"
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           onError={(e) => {
                             e.currentTarget.onerror = null;
                             e.currentTarget.src =
@@ -393,6 +444,9 @@ function EHLiving() {
                             EH Verified™
                           </span>
                         )}
+                        <div className="absolute bottom-3 right-3">
+                          <WishlistButton propertyId={property.id} variant="floating" size="sm" />
+                        </div>
                       </figure>
 
                       {/* TEXT block */}
@@ -424,12 +478,22 @@ function EHLiving() {
                           </div>
                         </div>
 
-                        <button
-                          className="mt-auto w-full bg-red-600 text-white font-semibold px-6 py-2 rounded-full shadow-md hover:bg-red-700 transition"
-                          aria-label={`Schedule visit for ${property.title}`}
-                        >
-                          Schedule Visit
-                        </button>
+                        <div className="mt-auto grid grid-cols-2 gap-3">
+                          <button
+                            onClick={() => { if (!requireAuth()) return; navigate(`/property/${property.id}`); }}
+                            className="w-full bg-red-600 text-white font-semibold px-4 py-2 rounded-full shadow-md hover:bg-red-700 transition"
+                            aria-label={`View details for ${property.title}`}
+                          >
+                            View Details
+                          </button>
+                          <button
+                            onClick={() => { if (!requireAuth()) return; navigate('/contact-us'); }}
+                            className="w-full bg-white text-gray-800 font-semibold px-4 py-2 rounded-full shadow-md border border-gray-200 hover:bg-gray-50 transition"
+                            aria-label={`Contact about ${property.title}`}
+                          >
+                            Contact
+                          </button>
+                        </div>
                       </div>
                     </article>
                   </SwiperSlide>
@@ -466,6 +530,16 @@ function EHLiving() {
                 aria-label="Next property"
               >
                 <FiChevronRight size={24} />
+              </button>
+            </div>
+
+            {/* View All EH Verified button */}
+            <div className="mt-10 flex justify-center">
+              <button
+                onClick={() => { if (!requireAuth()) return; navigate('/properties?subcategory=eh_verified'); }}
+                className="px-6 py-3 rounded-full font-semibold bg-white text-gray-900 shadow-md hover:bg-gray-50 border border-gray-200"
+              >
+                View All EH Verified Properties
               </button>
             </div>
           </div>

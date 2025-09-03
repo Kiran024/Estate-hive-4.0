@@ -8,6 +8,8 @@ export const authService = {
       password,
       options: {
         data: metadata,
+        // Send users back into the SPA after email verification
+        // Using HashRouter, so include the hash route
         emailRedirectTo: `${window.location.origin}/#/auth`
       }
     });
@@ -27,12 +29,26 @@ export const authService = {
     return data;
   },
 
+  // Resend signup confirmation email
+  async resendSignup(email) {
+    const { data, error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/#/auth`
+      }
+    });
+    if (error) throw error;
+    return data;
+  },
+
   // Sign in with OAuth providers (Google, LinkedIn)
   async signInWithProvider(provider) {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`
+        // Use HashRouter route for the callback
+        redirectTo: `${window.location.origin}/#/auth/callback`
       }
     });
     

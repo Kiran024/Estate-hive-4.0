@@ -646,6 +646,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom"; // <--- 1. IMPORT LINK
+import { useAuth } from "../contexts/AuthContext";
 import properties from "../data/properties";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
@@ -664,6 +665,18 @@ const TABS = [
  
 ];
 const PLACEHOLDER = "/images/properties/placeholder.jpg";
+
+// Curated initial 6 for unauthorized users under "For Sale"
+const CURATED_FOR_SALE_TITLES = [
+  "Brigade Eternia",
+  "L&T Elara Celestia",
+  "Barca At Godrej MSR City",
+  "Surya Valencia",
+  "Elegant Takt Tropical Symphony",
+  "Assetz Sora and Saki",
+];
+
+//
 
 /** Title helper (fallback to filename if needed) */
 const deriveTitleFromImage = (img) => {
@@ -735,32 +748,85 @@ const getPerView = () => {
 };
 
 export default function PropertyListing({ listings, onPropertyClick, showLoginPrompt }) {
+  const { user } = useAuth();
+  const isGuest = !user || !!onPropertyClick || !!showLoginPrompt;
   const sourceData = (Array.isArray(listings) && listings.length > 0) ? listings : properties;
   const data = useMemo(() => sourceData.map(normalize), [sourceData]);
+  // Full local catalog for curated fallback (ensures 6 items even if listings are sparse)
+  const fullData = useMemo(() => properties.map(normalize), []);
 
   const [activeTab, setActiveTab] = useState(0);
-  const [perView, setPerView] = useState(getPerView());
+  // Force 3-per-view for guests; responsive for signed-in users
+  const initialPerView = (isGuest ? 3 : getPerView());
+  const [perView, setPerView] = useState(initialPerView);
   const [pageIndex, setPageIndex] = useState(0);
+  const [showGate, setShowGate] = useState(false);
   const swiperRef = useRef(null);
 
   useEffect(() => {
-    const onResize = () => setPerView(getPerView());
+    const onResize = () => setPerView(isGuest ? 3 : getPerView());
+    // Initialize immediately
+    onResize();
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
-  }, []);
+  }, [isGuest]);
 
   const items = useMemo(() => {
     const want = TABS[activeTab].toLowerCase();
+    // For Sale curated view ONLY for guests (unauthorized)
+    if (isGuest && activeTab === 0) {
+      // Use full local dataset to guarantee 6 curated items
+      const allForSale = fullData.filter((p) => p.categoryNormalized === "for sale");
+      const mapByTitle = new Map(allForSale.map((p) => [p.title, p]));
+      const curated = CURATED_FOR_SALE_TITLES.map((t) => mapByTitle.get(t)).filter(Boolean);
+      if (curated.length >= 6) return curated.slice(0, 6);
+      const used = new Set(curated.map((p) => p.id));
+      const pad = allForSale.filter((p) => !used.has(p.id));
+      return [...curated, ...pad].slice(0, 6);
+    }
     return data.filter((p) => p.categoryNormalized === want);
-  }, [data, activeTab]);
+  }, [data, fullData, activeTab, isGuest]);
 
-  const totalPages = Math.max(1, Math.ceil(items.length / perView));
+  // Guest item limit: 3 on mobile (<768px), 6 on desktop (>=768px)
+  const computeGuestLimit = () => {
+    // For guests on "For Sale": always allow 6 items so it can paginate 3 + 3
+    if (isGuest && activeTab === 0) return 6;
+    if (typeof window === 'undefined') return 6;
+    return window.innerWidth < 768 ? 3 : 6;
+  };
+  const [guestLimit, setGuestLimit] = useState(computeGuestLimit());
+
+  useEffect(() => {
+    const onResizeLimit = () => setGuestLimit(computeGuestLimit());
+    onResizeLimit();
+    window.addEventListener('resize', onResizeLimit);
+    return () => window.removeEventListener('resize', onResizeLimit);
+  }, []);
+
+  // For guests on "For Sale": compute responsive per-view (1/2/3) for mobile/tablet/desktop
+  const calcGuestPerView = () => {
+    if (typeof window === 'undefined') return 3;
+    const w = window.innerWidth;
+    if (w >= 768) return 3; // tablet/desktop
+    return 1;               // all mobile widths show 1 card
+  };
+
+  // Limit unauthenticated users by guestLimit
+  const displayItems = useMemo(() => {
+    if (!user) return items.slice(0, guestLimit);
+    return items;
+  }, [user, items, guestLimit]);
+
+  const isForSaleGuest = isGuest && activeTab === 0;
+  const currentPerView = isForSaleGuest ? calcGuestPerView() : perView;
+  const totalPages = Math.max(1, Math.ceil(displayItems.length / currentPerView));
 
   useEffect(() => {
     setPageIndex(0);
     const s = swiperRef.current?.swiper;
     if (s) s.slideTo(0, 0);
-  }, [activeTab, perView]);
+    setShowGate(false);
+  }, [activeTab, perView, guestLimit]);
 
   const goPrev = () => {
     if (pageIndex > 0) {
@@ -774,6 +840,11 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
   const goNext = () => {
     if (pageIndex < totalPages - 1) {
       swiperRef.current?.swiper.slideNext();
+      return;
+    }
+    // At the last page. For unauthenticated users, show gate instead of switching tab
+    if (!user) {
+      setShowGate(true);
       return;
     }
     const nextTab = (activeTab + 1) % TABS.length;
@@ -832,13 +903,24 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
             <Swiper
               ref={swiperRef}
               modules={[Navigation]}
-              slidesPerView={perView}
-              slidesPerGroup={perView}
-              spaceBetween={20}
-              onSlideChange={(s) => setPageIndex(Math.floor(s.activeIndex / perView))}
+              slidesPerView={isForSaleGuest ? currentPerView : perView}
+              slidesPerGroup={isForSaleGuest ? currentPerView : perView}
+              spaceBetween={isForSaleGuest ? 12 : 20}
+              breakpoints={isForSaleGuest ? {
+                0:   { slidesPerView: 1, slidesPerGroup: 1, spaceBetween: 10 },
+                768: { slidesPerView: 3, slidesPerGroup: 3, spaceBetween: 12 },
+              } : {
+                0:   { slidesPerView: 1, slidesPerGroup: 1, spaceBetween: 16 },
+                768: { slidesPerView: 2, slidesPerGroup: 2, spaceBetween: 20 },
+                1024:{ slidesPerView: 3, slidesPerGroup: 3, spaceBetween: 20 },
+              }}
+              onSlideChange={(s) => {
+                const pv = typeof s.params?.slidesPerView === 'number' ? s.params.slidesPerView : currentPerView;
+                setPageIndex(Math.floor(s.activeIndex / pv));
+              }}
               className="pb-2"
             >
-              {items.map((it, idx) => {
+              {displayItems.map((it, idx) => {
                 const originalIndex = data.findIndex((d) => d.id === it.id);
                 return (
                   <SwiperSlide key={`${it.id}-${idx}`}>
@@ -847,6 +929,34 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
                 );
               })}
             </Swiper>
+
+            {/* Gate overlay for guests */}
+            {showGate && (
+              <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 px-4">
+                <div className="bg-white max-w-md w-full rounded-2xl shadow-2xl p-6 text-center">
+                  <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
+                    Unlock 38 More Premium Properties
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    Create a free account to access our complete collection of verified exclusive properties
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <a
+                      href="/#/auth"
+                      className="inline-flex justify-center items-center px-5 py-2.5 rounded-full bg-red-600 text-white font-semibold hover:bg-red-700 shadow"
+                    >
+                      Create Free Account
+                    </a>
+                    <button
+                      onClick={() => setShowGate(false)}
+                      className="inline-flex justify-center items-center px-5 py-2.5 rounded-full bg-gray-100 text-gray-800 font-semibold hover:bg-gray-200 border border-gray-200"
+                    >
+                      Maybe Later
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
             
             <div className="md:hidden mt-6 flex justify-center gap-6">
               <button onClick={goPrev} className="h-10 w-10 rounded-full bg-slate-800 text-white shadow hover:bg-red-600 flex items-center justify-center">
