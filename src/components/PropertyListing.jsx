@@ -648,6 +648,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom"; // <--- 1. IMPORT LINK
 import { useAuth } from "../contexts/AuthContext";
 import properties from "../data/properties";
+import { propertyService } from "../services/propertyService";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import WishlistButton from "./common/WishlistButton";
@@ -738,6 +739,58 @@ const normalize = (p = {}) => {
   };
 };
 
+// Prefer higher resolution image URLs for signed-in users where possible
+const deriveHighRes = (url) => {
+  if (!url || typeof url !== 'string') return url;
+  try {
+    let out = url;
+    // Common pattern from sample data like h02@300x-100.jpg => h02@1080x-100.jpg
+    out = out.replace(/@300x-\d+/g, '@1080x-100');
+    out = out.replace(/@300x/g, '@1080x');
+    return out;
+  } catch {
+    return url;
+  }
+};
+
+// Choose the best available image for logged-in users
+const pickBestImage = (raw, fallback) => {
+  try {
+    const arr = Array.isArray(raw?.image_urls)
+      ? raw.image_urls
+      : Array.isArray(raw?.images)
+      ? raw.images
+      : Array.isArray(raw?.image)
+      ? raw.image
+      : [];
+    let chosen = arr.find((u) => typeof u === 'string' && /@1080x|@1200x|@1920x/.test(u))
+      || arr.find((u) => typeof u === 'string' && !/@300x/.test(u))
+      || arr[0];
+    return deriveHighRes(chosen || fallback);
+  } catch {
+    return deriveHighRes(fallback);
+  }
+};
+
+// Build a responsive srcSet from a base URL following the @{width}x- pattern
+const buildSrcSetFromUrl = (url) => {
+  if (!url || typeof url !== 'string') return undefined;
+  // Only handle the @{width}x-{q} style; otherwise return undefined
+  const match = url.match(/@(\d+)x(-\d+)?/);
+  if (!match) return undefined;
+  const widths = [480, 768, 1080, 1440];
+  const unique = new Map();
+  widths.forEach((w) => {
+    const candidate = url
+      .replace(/@\d+x-\d+/g, `@${w}x-100`)
+      .replace(/@\d+x/g, `@${w}x`);
+    unique.set(w, candidate);
+  });
+  return Array.from(unique.entries())
+    .map(([w, u]) => `${u} ${w}w`)
+    .join(', ');
+};
+
 /** Slides per view helper so arrow-logic matches breakpoints */
 const getPerView = () => {
   if (typeof window === "undefined") return 3;
@@ -749,7 +802,7 @@ const getPerView = () => {
 
 export default function PropertyListing({ listings, onPropertyClick, showLoginPrompt }) {
   const { user } = useAuth();
-  const isGuest = !user || !!onPropertyClick || !!showLoginPrompt;
+  const isGuest = !user; // Logged-in users are never gated
   const sourceData = (Array.isArray(listings) && listings.length > 0) ? listings : properties;
   const data = useMemo(() => sourceData.map(normalize), [sourceData]);
   // Full local catalog for curated fallback (ensures 6 items even if listings are sparse)
@@ -761,7 +814,47 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
   const [perView, setPerView] = useState(initialPerView);
   const [pageIndex, setPageIndex] = useState(0);
   const [showGate, setShowGate] = useState(false);
+  const [showDubaiGate, setShowDubaiGate] = useState(false);
   const swiperRef = useRef(null);
+
+  // Fetch live For Sale properties for signed-in users so details route IDs match
+  const [liveSale, setLiveSale] = useState([]);
+  const [liveSaleLoaded, setLiveSaleLoaded] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    const fetchLive = async () => {
+      if (!user) {
+        setLiveSale([]);
+        setLiveSaleLoaded(false);
+        return;
+      }
+      try {
+        const { data: rows, error } = await propertyService.getAllProperties({
+          status: 'active',
+          category: 'sale',
+          sortBy: 'created_at',
+          sortOrder: 'desc',
+          pageSize: 48,
+        });
+        if (cancelled) return;
+        if (error) {
+          setLiveSale([]);
+          setLiveSaleLoaded(true);
+          return;
+        }
+        const mapped = Array.isArray(rows) ? rows.map(normalize) : [];
+        setLiveSale(mapped);
+        setLiveSaleLoaded(true);
+      } catch {
+        if (!cancelled) {
+          setLiveSale([]);
+          setLiveSaleLoaded(true);
+        }
+      }
+    };
+    fetchLive();
+    return () => { cancelled = true; };
+  }, [user]);
 
   useEffect(() => {
     const onResize = () => setPerView(isGuest ? 3 : getPerView());
@@ -775,7 +868,6 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
     const want = TABS[activeTab].toLowerCase();
     // For Sale curated view ONLY for guests (unauthorized)
     if (isGuest && activeTab === 0) {
-      // Use full local dataset to guarantee 6 curated items
       const allForSale = fullData.filter((p) => p.categoryNormalized === "for sale");
       const mapByTitle = new Map(allForSale.map((p) => [p.title, p]));
       const curated = CURATED_FOR_SALE_TITLES.map((t) => mapByTitle.get(t)).filter(Boolean);
@@ -784,8 +876,12 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
       const pad = allForSale.filter((p) => !used.has(p.id));
       return [...curated, ...pad].slice(0, 6);
     }
+    // For logged-in users on For Sale tab: use live data with real IDs
+    if (!isGuest && want === 'for sale' && (liveSaleLoaded || liveSale.length)) {
+      return liveSale;
+    }
     return data.filter((p) => p.categoryNormalized === want);
-  }, [data, fullData, activeTab, isGuest]);
+  }, [data, fullData, activeTab, isGuest, liveSale, liveSaleLoaded]);
 
   // Guest item limit: 3 on mobile (<768px), 6 on desktop (>=768px)
   const computeGuestLimit = () => {
@@ -851,6 +947,17 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
     setActiveTab(nextTab);
   };
 
+  // Handle tab clicks with EH tabs gating for guests
+  const handleTabClick = (i) => {
+    const label = TABS[i];
+    const gatedLabels = new Set(["EH Dubai", "Luxury Rentals", "EH Commercial", "EH Verified", "EH Signature�,�"]);
+    if (!user && gatedLabels.has(label)) {
+      setShowDubaiGate(true);
+      return;
+    }
+    setActiveTab(i);
+  };
+
   return (
     <section className="relative bg-white pt-16 pb-10 px-4">
       <div className="max-w-7xl mx-auto">
@@ -860,7 +967,7 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
             {TABS.map((t, i) => (
               <button
                 key={t}
-                onClick={() => setActiveTab(i)}
+                onClick={() => handleTabClick(i)}
                 className={[
                   "px-3 py-2 md:px-4 rounded-full text-xs md:text-sm font-medium whitespace-nowrap transition flex-shrink-0",
                   activeTab === i
@@ -924,7 +1031,7 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
                 const originalIndex = data.findIndex((d) => d.id === it.id);
                 return (
                   <SwiperSlide key={`${it.id}-${idx}`}>
-                    <Card item={it} index={idx} dataIndex={originalIndex} onPropertyClick={onPropertyClick} />
+                    <Card item={it} index={idx} dataIndex={originalIndex} onPropertyClick={onPropertyClick} isLoggedIn={!!user} />
                   </SwiperSlide>
                 );
               })}
@@ -934,25 +1041,25 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
             {showGate && (
               <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 px-4">
                 <div className="bg-white max-w-md w-full rounded-2xl shadow-2xl p-6 text-center">
-                  <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
-                    Unlock 38 More Premium Properties
-                  </h3>
-                  <p className="text-gray-600 mb-6">
-                    Create a free account to access our complete collection of verified exclusive properties
-                  </p>
+                  <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Unlock 38 More Premium Properties</h3>
+                  <p className="text-gray-600 mb-6">Create a free account to access our complete collection of verified exclusive properties</p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <a
-                      href="/#/auth"
-                      className="inline-flex justify-center items-center px-5 py-2.5 rounded-full bg-red-600 text-white font-semibold hover:bg-red-700 shadow"
-                    >
-                      Create Free Account
-                    </a>
-                    <button
-                      onClick={() => setShowGate(false)}
-                      className="inline-flex justify-center items-center px-5 py-2.5 rounded-full bg-gray-100 text-gray-800 font-semibold hover:bg-gray-200 border border-gray-200"
-                    >
-                      Maybe Later
-                    </button>
+                    <button onClick={() => setShowGate(false)} className="inline-flex justify-center items-center px-5 py-2.5 rounded-full bg-gray-100 text-gray-900 font-semibold hover:bg-gray-200 border border-gray-200">May be Later</button>
+                    <a href="/#/auth" className="inline-flex justify-center items-center px-5 py-2.5 rounded-full bg-[#040449] text-white font-semibold hover:opacity-90 shadow">Create Account</a>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Dubai-specific gate for guests when clicking the EH Dubai tab */}
+            {showDubaiGate && (
+              <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 px-4">
+                <div className="bg-white max-w-md w-full rounded-2xl shadow-2xl p-6 text-center">
+                  <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Unlock 38 More Premium Properties</h3>
+                  <p className="text-gray-600 mb-6">Create a free account to access our complete collection of verified exclusive properties</p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button onClick={() => setShowDubaiGate(false)} className="inline-flex justify-center items-center px-5 py-2.5 rounded-full bg-gray-100 text-gray-900 font-semibold hover:bg-gray-200 border border-gray-200">May be Later</button>
+                    <a href="/#/auth" className="inline-flex justify-center items-center px-5 py-2.5 rounded-full bg-[#040449] text-white font-semibold hover:opacity-90 shadow">Create Account</a>
                   </div>
                 </div>
               </div>
@@ -978,18 +1085,31 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
 }
 
 // Card component - UPDATED
-function Card({ item, index, onPropertyClick, dataIndex }) {
+function Card({ item, index, onPropertyClick, dataIndex, isLoggedIn }) {
   const { id, title, image, location, type, area, price } = item;
   const imgFirst = index % 2 === 0;
 
   const ImageBlock = (
     <div className="relative w-full h-[240px] md:h-[250px] lg:h-[260px] bg-gray-100">
-      <img
-        src={image || PLACEHOLDER}
-        alt={title }
-        className="absolute inset-0 h-full w-full object-cover"
-        loading="lazy"
-      />
+      {isLoggedIn ? (
+        <img
+          src={pickBestImage(item.raw, image) || PLACEHOLDER}
+          srcSet={buildSrcSetFromUrl(pickBestImage(item.raw, image))}
+          sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+          alt={title}
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <img
+          src={image || PLACEHOLDER}
+          alt={title}
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="lazy"
+          decoding="async"
+        />
+      )}
       {/* Add Wishlist Button */}
       <div className="absolute top-3 right-3 z-10">
         <WishlistButton 
@@ -1013,22 +1133,12 @@ function Card({ item, index, onPropertyClick, dataIndex }) {
       </div>
       <div className="mt-3 flex items-center justify-between">
         <div className="text-2xl font-bold text-gray-900">{price}</div>
-        {/* Use onPropertyClick if provided, otherwise direct navigation */}
-        {onPropertyClick ? (
-          <button
-            onClick={(e) => onPropertyClick((Number.isInteger(dataIndex) && dataIndex >= 0) ? dataIndex : index, e)}
-            className="rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white shadow transition-colors hover:bg-red-700"
-          >
-            View Details
-          </button>
-        ) : (
-          <Link
-            to={`/properties/${id}`}
-            className="rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white shadow transition-colors hover:bg-red-700"
-          >
-            View Details
-          </Link>
-        )}
+        <Link
+          to={`/property/${id}`}
+          className="rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white shadow transition-colors hover:bg-red-700"
+        >
+          View Details
+        </Link>
       </div>
     </div>
   );

@@ -478,20 +478,13 @@ function EHLiving() {
                           </div>
                         </div>
 
-                        <div className="mt-auto grid grid-cols-2 gap-3">
+                        <div className="mt-auto flex justify-end">
                           <button
                             onClick={() => { if (!requireAuth()) return; navigate(`/property/${property.id}`); }}
-                            className="w-full bg-red-600 text-white font-semibold px-4 py-2 rounded-full shadow-md hover:bg-red-700 transition"
+                            className="bg-red-600 text-white font-semibold px-4 py-2 rounded-full shadow-md hover:bg-red-700 transition"
                             aria-label={`View details for ${property.title}`}
                           >
                             View Details
-                          </button>
-                          <button
-                            onClick={() => { if (!requireAuth()) return; navigate('/contact-us'); }}
-                            className="w-full bg-white text-gray-800 font-semibold px-4 py-2 rounded-full shadow-md border border-gray-200 hover:bg-gray-50 transition"
-                            aria-label={`Contact about ${property.title}`}
-                          >
-                            Contact
                           </button>
                         </div>
                       </div>

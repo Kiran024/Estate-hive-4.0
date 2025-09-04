@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+ import React, { useEffect, useMemo, useState } from 'react';    
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'; // Corrected import for carousel arrows
 import { Swiper, SwiperSlide } from 'swiper/react'; // Import Swiper components
 import { Navigation } from 'swiper/modules'; // Import Navigation module
@@ -7,7 +8,67 @@ import { Navigation } from 'swiper/modules'; // Import Navigation module
 import 'swiper/css';
 import 'swiper/css/navigation'; // Import navigation CSS
 
+
+import 'swiper/css/navigation'; // Import navigation CSS
+import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import WishlistButton from '../common/WishlistButton';
+import { propertyService } from '../../services/propertyService';
+
+const PLACEHOLDER = '/h01@300x-100.jpg';
+
+// Prefer higher resolution image URLs for signed-in users where possible
+const deriveHighRes = (url) => {
+  if (!url || typeof url !== 'string') return url;
+  try {
+    let out = url;
+    out = out.replace(/@300x-\d+/g, '@1080x-100');
+    out = out.replace(/@300x/g, '@1080x');
+    return out;
+  } catch {
+    return url;
+  }
+};
+
+// Build a responsive srcSet from a base URL following the @{width}x- pattern
+const buildSrcSetFromUrl = (url) => {
+  if (!url || typeof url !== 'string') return undefined;
+  const match = url.match(/@(\d+)x(-\d+)?/);
+  if (!match) return undefined;
+  const widths = [480, 768, 1080, 1440];
+  const unique = new Map();
+  widths.forEach((w) => {
+    const candidate = url
+      .replace(/@\d+x-\d+/g, `@${w}x-100`)
+      .replace(/@\d+x/g, `@${w}x`);
+    unique.set(w, candidate);
+  });
+  return Array.from(unique.entries())
+    .map(([w, u]) => `${u} ${w}w`)
+    .join(', ');
+};
+
+const pickBestImage = (raw, fallback) => {
+  try {
+    const arr = Array.isArray(raw?.image_urls)
+      ? raw.image_urls
+      : Array.isArray(raw?.images)
+      ? raw.images
+      : Array.isArray(raw?.image)
+      ? raw.image
+      : [];
+    let chosen = arr.find((u) => typeof u === 'string' && /@1080x|@1200x|@1920x/.test(u))
+      || arr.find((u) => typeof u === 'string' && !/@300x/.test(u))
+      || arr[0];
+    return deriveHighRes(chosen || fallback);
+  } catch {
+    return fallback;
+  }
+};
 function EHStay() {
+  const { user } = useAuth();
+  const isGuest = !user;
+  const navigate = useNavigate(); 
   // Dummy data for "For Property Owners" numbered features
   const ownerFeatures = [
     {
@@ -42,19 +103,69 @@ function EHStay() {
   // Dummy data for "For Guests" features
   const guestFeatures = [
     {
-      title: 'Premium Listing',
-      description: 'Professional photography and premium placement',
+      title: 'Curated Boutique Homes',
+      description: 'Handpicked properties with unique design and amenities',
     },
     {
-      title: 'Verified Guests',
-      description: 'All guests verified through our rigorous process',
+      title: 'Local Experiences',
+      description: 'Live like a local with insider recommendations and support',
     },
     {
-      title: 'Concierge Service',
-      description: '24/7 guest support and property management',
+      title: 'Flexible Stays',
+      description: 'Short-term and extended stays for business or leisure',
     },
   ];
 
+  // Live Luxury Rentals (lease) for Featured Stays
+  const [stays, setStays] = useState([]);
+  const [loadingStays, setLoadingStays] = useState(true);
+  const [staysError, setStaysError] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetch = async () => {
+      try {
+        setLoadingStays(true);
+        setStaysError('');
+        const { data, error } = await propertyService.getAllProperties({
+          status: 'active',
+          category: 'lease',
+          sortBy: 'created_at',
+          sortOrder: 'desc',
+          pageSize: 48,
+        });
+        if (cancelled) return;
+        if (error) throw new Error(error);
+        setStays(Array.isArray(data) ? data : []);
+      } catch (e) {
+        if (!cancelled) {
+          setStays([]);
+          setStaysError(e?.message || 'Failed to load Featured Stays');
+        }
+      } finally {
+        if (!cancelled) setLoadingStays(false);
+      }
+    };
+    fetch();
+    return () => { cancelled = true; };
+  }, []);
+
+  const normalizedStays = useMemo(() =>
+    stays.map((p, idx) => {
+      const title = p.title || 'Untitled Property';
+      const location = [p.neighborhood, p.city].filter(Boolean).join(', ');
+      const primary = p.image_urls?.[0] || p.featured_image || p.image || PLACEHOLDER;
+      return {
+        id: p.id,
+        title,
+        location,
+        price: p.price || p.rent_amount || '',
+        image: primary,
+        raw: p,
+        idx,
+      };
+    })
+  , [stays]);
   // Dummy data for Featured Stays properties
   const featuredStaysProperties = [
     {
@@ -299,6 +410,14 @@ function EHStay() {
                 nextEl: '.swiper-button-next-stays',
                 prevEl: '.swiper-button-prev-stays',
               }}
+              onBeforeInit={(swiper) => {
+                swiper.params.navigation = swiper.params.navigation || {};
+                swiper.params.navigation.prevEl = '.swiper-button-prev-stays';
+                swiper.params.navigation.nextEl = '.swiper-button-next-stays';
+              }}
+              onAfterInit={(swiper) => {
+                try { swiper.navigation.init(); swiper.navigation.update(); } catch {}
+              }}
               breakpoints={{
                 640: { // sm breakpoint
                   slidesPerView: 1,
@@ -312,106 +431,129 @@ function EHStay() {
               }}
               className="pb-0" // No padding for pagination dots
             >
-              {featuredStaysProperties.map((property) => (
+      {normalizedStays.map((property, index) => {
+    const imgFirst = index % 2 === 0;
+    const ImageBlock = (
+      <div className="relative w-full h-56 md:h-60 lg:h-64 bg-gray-100">
+        {user ? (
+          <img
+            src={pickBestImage(property.raw, property.image) || PLACEHOLDER}
+            srcSet={buildSrcSetFromUrl(pickBestImage(property.raw, property.image))}
+            sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+            alt={property.title}
+            className="absolute inset-0 h-full w-full object-cover"
+            loading="lazy"
+            decoding="async"
+            onError={(e) => { e.currentTarget.src = PLACEHOLDER; }}
+          />
+        ) : (
+          <img
+            src={property.image || PLACEHOLDER}
+            alt={property.title}
+            className="absolute inset-0 h-full w-full object-cover"
+            loading="lazy"
+            decoding="async"
+            onError={(e) => { e.currentTarget.src = PLACEHOLDER; }}
+          />
+        )}
+        <div className="absolute top-3 right-3 z-10">
+          <WishlistButton propertyId={property.id} variant="floating" size="sm" />
+        </div>
+      </div>
+    );
+    const TextBlock = (
+      <div className="flex flex-col gap-2 p-4 lg:p-5 text-left">
+        <h3 className="text-lg md:text-xl font-semibold text-gray-900 leading-snug">{property.title}</h3>
+        <div className="text-sm text-gray-600">{property.location}</div>
+        <div className="mt-3 flex items-center justify-between">
+          <div className="text-xl md:text-2xl font-bold text-gray-900">{property.price}</div>
+          <button
+            onClick={() => {
+              if (isGuest) return navigate('/auth');
+              navigate(`/property/${property.id}`);
+            }}
+            className="rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white shadow transition-colors hover:bg-red-700"
+          >
+            View Details
+          </button>
+        </div>
+      </div>
+    );
+              return (
                 <SwiperSlide key={property.id}>
-                  <div
-                    className="
-                      bg-white rounded-xl shadow-md overflow-hidden
-                      border border-gray-200 /* Subtle border */
-                      hover:shadow-lg transition-all duration-300 ease-in-out
-                      h-full flex flex-col justify-between /* Ensure consistent height and button alignment */
-                    "
-                  >
-                    {/* Property Image with Price Overlay Badge */}
-                    <div className="relative w-full h-56 overflow-hidden"> {/* Fixed height for image */}
-                      <img
-                        src={property.image}
-                        alt={property.title}
-                        className="w-full h-full object-cover"
-                        onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/400x250/E0E0E0/333333?text=Image+Error`; }}
-                      />
-                      <span className="
-                        absolute top-3 left-3
-                        bg-red-600 text-white text-xs font-semibold
-                        px-3 py-1 rounded-full
-                        shadow-md
-                      ">
-                        {property.pricePerNight}
-                      </span>
-                    </div>
-
-                    {/* Property Content */}
-                    <div className="p-4 text-left flex-grow flex flex-col justify-between">
-                      <div>
-                        <h3 className="font-bold text-lg text-gray-900 mb-1">{property.title}</h3>
-                        <p className="text-sm text-gray-600 mb-3">{property.location}</p>
-
-                        <div className="flex items-center text-sm text-gray-500 mb-4">
-                          {/* Star Icon */}
-                          <svg
-                            className="h-4 w-4 text-yellow-500 mr-1"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                          </svg>
-                          <span>{property.rating} ({property.reviews})</span>
-                        </div>
-                      </div>
-
-                      <div className="text-right mt-auto"> {/* Align button to the right and push to bottom */}
-                        <button className="
-                          bg-red-600 text-white font-semibold
-                          px-6 py-2 rounded-full
-                          shadow-md hover:bg-red-700 transition duration-300
-                          w-full /* Full width button */
-                        ">
-                          Book Now
-                        </button>
-                      </div>
+                  <div className="h-full w-full">
+                    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow duration-300 hover:shadow-xl">
+                      {imgFirst ? (
+                        <React.Fragment>
+                          {ImageBlock}
+                          {TextBlock}
+                        </React.Fragment>
+                      ) : (
+                        <React.Fragment>
+                          {TextBlock}
+                          {ImageBlock}
+                        </React.Fragment>
+                      )}
                     </div>
                   </div>
                 </SwiperSlide>
-              ))}
-            </Swiper>
+              );
+            })}
+          </Swiper>
 
-            {/* Navigation Arrows - Desktop */}
-            <div className="hidden md:flex justify-between absolute inset-y-0 w-full pointer-events-none">
-              <button
-                className="swiper-button-prev-stays pointer-events-auto bg-white text-gray-800 hover:text-white p-3 rounded-full shadow-lg hover:bg-gray-700 transition absolute left-[-40px] top-1/2 -translate-y-1/2 z-20"
-                aria-label="Previous property"
-              >
-                <FiChevronLeft size={24} />
-              </button>
-              <button
-                className="swiper-button-next-stays pointer-events-auto bg-white text-gray-800 hover:text-white p-3 rounded-full shadow-lg hover:bg-gray-700 transition absolute right-[-40px] top-1/2 -translate-y-1/2 z-20"
-                aria-label="Next property"
-              >
-                <FiChevronRight size={24} />
-              </button>
-            </div>
+          {/* Navigation Arrows - Desktop */}
+          <div className="hidden md:flex justify-between absolute inset-y-0 w-full pointer-events-none">
+            <button
+              className="swiper-button-prev-stays pointer-events-auto bg-gray-800 text-white p-3 rounded-full shadow-lg hover:bg-gray-700 transition absolute left-[-40px] top-1/2 -translate-y-1/2 z-20"
+              aria-label="Previous property"
+            >
+              <FiChevronLeft size={24} />
+            </button>
+            <button
+              className="swiper-button-next-stays pointer-events-auto bg-gray-800 text-white p-3 rounded-full shadow-lg hover:bg-gray-700 transition absolute right-[-40px] top-1/2 -translate-y-1/2 z-20"
+              aria-label="Next property"
+            >
+              <FiChevronRight size={24} />
+            </button>
+          </div>
 
-            {/* Navigation Arrows - Mobile */}
-            <div className="md:hidden flex justify-center mt-8 space-x-4">
-              <button
-                className="swiper-button-prev-stays bg-white text-gray-800 rounded-full p-3 shadow-lg hover:bg-gray-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                aria-label="Previous property"
-              >
-                <FiChevronLeft size={24} />
-              </button>
-              <button
-                className="swiper-button-next-stays bg-white text-gray-800 rounded-full p-3 shadow-lg hover:bg-gray-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
-                aria-label="Next property"
-              >
-                <FiChevronRight size={24} />
-              </button>
-            </div>
+          {/* Navigation Arrows - Mobile */}
+          <div className="md:hidden flex justify-center mt-8 space-x-4">
+            <button
+              className="swiper-button-prev-stays bg-gray-800 text-white rounded-full p-3 shadow-lg hover:bg-gray-700 transition"
+              aria-label="Previous property"
+            >
+              <FiChevronLeft size={24} />
+            </button>
+            <button
+              className="swiper-button-next-stays bg-gray-800 text-white rounded-full p-3 shadow-lg hover:bg-gray-700 transition"
+              aria-label="Next property"
+            >
+              <FiChevronRight size={24} />
+            </button>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
+
+    {/* View EH Stay Properties CTA */}
+    <section className="bg-[#2A2A3F] px-4 pb-16 overflow-hidden">
+      <div className="mt-6 flex justify-center">
+        <button
+          onClick={() => {
+            if (isGuest) return navigate('/auth');
+            navigate('/properties?category=lease');
+          }}
+          className="px-6 py-3 rounded-full font-semibold bg-red-600 text-white shadow-md hover:bg-red-700"
+        >
+          View EH Stay Properties
+        </button>
+      </div>
+    </section>
     </>
   );
 }
+
+
 
 export default EHStay;
