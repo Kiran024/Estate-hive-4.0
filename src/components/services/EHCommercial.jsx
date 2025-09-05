@@ -251,7 +251,7 @@ function EHCommercial() {
       className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 drop-shadow-lg"
       style={{ fontFamily: "'Exo 2', sans-serif" }}
     >
-      EH Commercial™
+      EH Commercial
     </motion.h1>
 
                   <motion.p

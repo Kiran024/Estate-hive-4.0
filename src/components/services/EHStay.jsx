@@ -17,6 +17,42 @@ import { propertyService } from '../../services/propertyService';
 
 const PLACEHOLDER = '/h01@300x-100.jpg';
 
+// INR short formatter similar to AllPropertiesEnhanced (Cr/L) with rupee symbol
+const formatINRShort = (value) => {
+  if (value === null || value === undefined || value === '') return 'Price on Request';
+
+  // If already a formatted string with Cr/L, ensure rupee symbol
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    const hasCrOrL = /\b(cr|crore|l|lac|lakh)\b/i.test(trimmed);
+    const hasRupee = /\u20B9|₹/.test(trimmed);
+    if (hasCrOrL) {
+      const cleaned = trimmed
+        .replace(/crore/i, 'Cr')
+        .replace(/lakh|lac/i, 'L')
+        .replace(/\s+/g, ' ');
+      return hasRupee ? cleaned : `₹${cleaned}`;
+    }
+    // Try parse numeric from string
+    const numeric = Number(trimmed.replace(/[^0-9.]/g, ''));
+    if (!Number.isNaN(numeric) && numeric > 0) {
+      return formatINRShort(numeric);
+    }
+    return trimmed;
+  }
+
+  // Numeric handling
+  const n = Number(value);
+  if (Number.isNaN(n)) return 'Price on Request';
+  if (n >= 10000000) {
+    return `₹${(n / 10000000).toFixed(2)} Cr`;
+  }
+  if (n >= 100000) {
+    return `₹${(n / 100000).toFixed(2)} L`;
+  }
+  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n);
+};
+
 // Prefer higher resolution image URLs for signed-in users where possible
 const deriveHighRes = (url) => {
   if (!url || typeof url !== 'string') return url;
@@ -150,22 +186,54 @@ function EHStay() {
     return () => { cancelled = true; };
   }, []);
 
-  const normalizedStays = useMemo(() =>
-    stays.map((p, idx) => {
-      const title = p.title || 'Untitled Property';
-      const location = [p.neighborhood, p.city].filter(Boolean).join(', ');
-      const primary = p.image_urls?.[0] || p.featured_image || p.image || PLACEHOLDER;
-      return {
-        id: p.id,
-        title,
-        location,
-        price: p.price || p.rent_amount || '',
-        image: primary,
-        raw: p,
-        idx,
-      };
-    })
-  , [stays]);
+  const normalizedStays = useMemo(
+    () =>
+      stays.map((p, idx) => {
+        const title = p.title || 'Untitled Property';
+        const location = [p.neighborhood, p.city].filter(Boolean).join(', ');
+        const primary = p.image_urls?.[0] || p.featured_image || p.image || PLACEHOLDER;
+
+        // Derive display fields similar to PropertyListing cards
+        const bedrooms = p?.bhk ?? p?.bedrooms;
+        const bhkLabel = bedrooms !== undefined && bedrooms !== null && `${String(bedrooms).trim()}BHK` || '';
+        // Prefer BHK label for type if available
+        const type = bhkLabel || p.type || p.property_type || '';
+        const ptype = (p.property_type || '').toString();
+        const residentialType = (ptype || 'residential').replace(/_/g, ' ');
+        const residentialLabel = residentialType
+          ? residentialType.charAt(0).toUpperCase() + residentialType.slice(1)
+          : '';
+        const rawArea =
+          p.area ||
+          p.area_sqft ||
+          p.built_up_area ||
+          p.carpet_area ||
+          p.plot_area ||
+          p.size ||
+          p.sqft;
+        const area =
+          rawArea !== undefined && rawArea !== null && rawArea !== ''
+            ? `${rawArea}`.toString().match(/sq/i)
+              ? `${rawArea}`
+              : `${rawArea} sqft`
+            : '';
+
+        return {
+          id: p.id,
+          title,
+          location,
+          price: p.price || p.rent_amount || '',
+          area,
+          type,
+          bhkLabel,
+          residentialLabel,
+          image: primary,
+          raw: p,
+          idx,
+        };
+      }),
+    [stays]
+  );
   // Dummy data for Featured Stays properties
   const featuredStaysProperties = [
     {
@@ -465,8 +533,18 @@ function EHStay() {
       <div className="flex flex-col gap-2 p-4 lg:p-5 text-left">
         <h3 className="text-lg md:text-xl font-semibold text-gray-900 leading-snug">{property.title}</h3>
         <div className="text-sm text-gray-600">{property.location}</div>
+        {(property.residentialLabel || property.bhkLabel) && (
+          <div className="text-sm text-gray-600">
+            {(property.residentialLabel || 'Residential')}
+            {property.bhkLabel ? `/${property.bhkLabel}` : ''}
+          </div>
+        )}
+        <div className="mt-1 grid grid-cols-2 gap-2 text-sm text-gray-500">
+          <span className="truncate">{property.area}</span>
+          <span className="text-right">{property.type}</span>
+        </div>
         <div className="mt-3 flex items-center justify-between">
-          <div className="text-xl md:text-2xl font-bold text-gray-900">{property.price}</div>
+          <div className="text-xl md:text-2xl font-bold text-gray-900">{formatINRShort(property.price)}</div>
           <button
             onClick={() => {
               if (isGuest) return navigate('/auth');
@@ -504,13 +582,13 @@ function EHStay() {
           {/* Navigation Arrows - Desktop */}
           <div className="hidden md:flex justify-between absolute inset-y-0 w-full pointer-events-none">
             <button
-              className="swiper-button-prev-stays pointer-events-auto bg-gray-800 text-white p-3 rounded-full shadow-lg hover:bg-gray-700 transition absolute left-[-40px] top-1/2 -translate-y-1/2 z-20"
+              className="swiper-button-prev-stays pointer-events-auto bg-red-600 text-white p-3 rounded-full shadow-lg hover:bg-[#040449] transition absolute left-[-40px] top-1/2 -translate-y-1/2 z-20"
               aria-label="Previous property"
             >
               <FiChevronLeft size={24} />
             </button>
             <button
-              className="swiper-button-next-stays pointer-events-auto bg-gray-800 text-white p-3 rounded-full shadow-lg hover:bg-gray-700 transition absolute right-[-40px] top-1/2 -translate-y-1/2 z-20"
+              className="swiper-button-next-stays pointer-events-auto bg-red-600 text-white p-3 rounded-full shadow-lg hover:bg-[#040449] transition absolute right-[-40px] top-1/2 -translate-y-1/2 z-20"
               aria-label="Next property"
             >
               <FiChevronRight size={24} />
@@ -520,13 +598,13 @@ function EHStay() {
           {/* Navigation Arrows - Mobile */}
           <div className="md:hidden flex justify-center mt-8 space-x-4">
             <button
-              className="swiper-button-prev-stays bg-gray-800 text-white rounded-full p-3 shadow-lg hover:bg-gray-700 transition"
+              className="swiper-button-prev-stays bg-red-600 text-white rounded-full p-3 shadow-lg hover:bg-[#040449] transition"
               aria-label="Previous property"
             >
               <FiChevronLeft size={24} />
             </button>
             <button
-              className="swiper-button-next-stays bg-gray-800 text-white rounded-full p-3 shadow-lg hover:bg-gray-700 transition"
+              className="swiper-button-next-stays bg-red-600 text-white rounded-full p-3 shadow-lg hover:bg-[#040449] transition"
               aria-label="Next property"
             >
               <FiChevronRight size={24} />

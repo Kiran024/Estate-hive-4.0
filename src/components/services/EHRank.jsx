@@ -52,7 +52,7 @@ function EHRank() {
     },
     {
       id: 3,
-      image: '/h21@300x-100.jpg', // Using provided image
+      image: '/h211@300x-100.jpg', // Using provided image
       title: 'Modern Penthouse in Indiranagar',
       location: 'Indiranagar, Bangalore',
       price: '₹5.5 Cr',

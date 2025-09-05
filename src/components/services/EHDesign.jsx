@@ -332,7 +332,7 @@ function EHDesign() {
                 className="flex transition-transform duration-500 ease-in-out"
                 style={{ transform: `translateX(-${currentProjectIndex * (100 / cardsPerPage)}%)` }}
               >
-                {featuredProjects.map((project) => (
+                {featuredProjects.map((project, index) => (
                   <div
                     key={project.id}
                     className="
@@ -346,48 +346,60 @@ function EHDesign() {
                       hover:shadow-lg transition-all duration-300 ease-in-out
                       h-full flex flex-col justify-between /* Ensure consistent height and button alignment */
                     ">
-                      {/* Project Image with Cost Badge */}
-                      <div className="relative w-full h-56 overflow-hidden">
-                        <img
-                          src={project.image}
-                          alt={project.title}
-                          className="w-full h-full object-cover scale-[1.2]"
-                          onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/400x250/E0E0E0/333333?text=Image+Error`; }}
-                        />
-                        <span className="
-                          absolute top-3 left-3
-                          bg-red-600 text-white text-xs font-semibold
-                          px-3 py-1 rounded-full
-                          shadow-md
-                        ">
-                          {project.cost}
-                        </span>
-                      </div>
-
-                      {/* Project Content */}
-                      <div className="p-4 text-left flex-grow flex flex-col justify-between">
-                        <div>
-                          <h3 className="font-bold text-lg text-gray-900 mb-1">{project.title}</h3>
-                          <p className="text-sm text-gray-600 mb-3">{project.type}</p>
-                          
-                          <div className="flex items-center text-sm text-gray-500 mb-4">
-                            {/* Star Icon - Using placeholder SVG for consistency */}
-                            <svg className="h-4 w-4 text-yellow-500 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                            <span>Timeline: {project.timeline}</span>
+                      {(() => {
+                        const ImageBlock = (
+                          <div className="relative w-full h-56 overflow-hidden">
+                            <img
+                              src={project.image}
+                              alt={project.title}
+                              className="w-full h-full object-cover scale-[1.2]"
+                              onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/400x250/E0E0E0/333333?text=Image+Error`; }}
+                            />
+                            <span className="
+                              absolute top-3 left-3
+                              bg-red-600 text-white text-xs font-semibold
+                              px-3 py-1 rounded-full
+                              shadow-md
+                            ">
+                              {project.cost}
+                            </span>
                           </div>
-                        </div>
+                        );
 
-                        <div className="text-right mt-auto"> {/* Align button to the right and push to bottom */}
-                          <button className="
-                            bg-red-600 text-white font-semibold
-                            px-6 py-2 rounded-full
-                            shadow-md hover:bg-red-700 transition duration-300
-                            w-full /* Full width button */
-                          ">
-                            Book Now
-                          </button>
-                        </div>
-                      </div>
+                        const TextBlock = (
+                          <div className="p-4 text-left flex-grow flex flex-col justify-between">
+                            <div>
+                              <h3 className="font-bold text-lg text-gray-900 mb-1">{project.title}</h3>
+                              <p className="text-sm text-gray-600 mb-3">{project.type}</p>
+                              <div className="flex items-center text-sm text-gray-500 mb-4">
+                                <svg className="h-4 w-4 text-yellow-500 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                <span>Timeline: {project.timeline}</span>
+                              </div>
+                            </div>
+                            <div className="text-right mt-auto"> {/* Align button to the right and push to bottom */}
+                              <button className="
+                                bg-red-600 text-white font-semibold
+                                px-4 py-1.5 rounded-full text-sm
+                                shadow-md hover:bg-red-700 transition duration-300
+                              ">
+                                View Details
+                              </button>
+                            </div>
+                          </div>
+                        );
+
+                        return index % 2 === 0 ? (
+                          <>
+                            {ImageBlock}
+                            {TextBlock}
+                          </>
+                        ) : (
+                          <>
+                            {TextBlock}
+                            {ImageBlock}
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
                 ))}

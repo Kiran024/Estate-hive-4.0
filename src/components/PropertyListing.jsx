@@ -667,6 +667,62 @@ const TABS = [
 ];
 const PLACEHOLDER = "/images/properties/placeholder.jpg";
 
+// Format INR in short units with rupee symbol (Cr/L)
+const formatINRShort = (value) => {
+  const rupee = '\u20B9';
+  if (value === null || value === undefined || value === '') return '';
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    const hasUnit = /\b(cr|crore|l|lac|lakh|k|thousand)\b/i.test(trimmed);
+    const hasRupee = trimmed.includes(rupee);
+    if (hasUnit) {
+      const cleaned = trimmed
+        .replace(/crore/i, 'Cr')
+        .replace(/lakh|lac/i, 'L')
+        .replace(/thousand/i, 'K')
+        .replace(/\s+/g, ' ');
+      return hasRupee ? cleaned : `${rupee}${cleaned}`;
+    }
+    const numeric = Number(trimmed.replace(/[^0-9.]/g, ''));
+    if (!Number.isNaN(numeric) && numeric > 0) return formatINRShort(numeric);
+    return trimmed;
+  }
+  const n = Number(value);
+  if (Number.isNaN(n)) return '';
+  if (n >= 10000000) return `${rupee}${(n / 10000000).toFixed(2)} Cr`;
+  if (n >= 100000) return `${rupee}${(n / 100000).toFixed(2)} L`;
+  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n);
+};
+
+// Format monthly rent in short units with rupee symbol (K/L/Cr)
+const formatRentShort = (value) => {
+  const rupee = '\u20B9';
+  if (value === null || value === undefined || value === '') return '';
+  if (typeof value === 'string') {
+    // Strip any existing "/month" or "per month" suffix to avoid double appending
+    const base = value.replace(/\s*(?:\/|per\s*)month\b/gi, '').trim();
+    // If already contains unit, normalize and ensure rupee prefix
+    if (/\b(cr|crore|l|lac|lakh|k|thousand)\b/i.test(base) || /[kK]\b/.test(base)) {
+      const cleaned = base
+        .replace(/crore/i, 'Cr')
+        .replace(/lakh|lac/i, 'L')
+        .replace(/thousand/i, 'K')
+        .replace(/\s+/g, ' ');
+      return cleaned.includes(rupee) ? cleaned : `${rupee}${cleaned}`;
+    }
+    // Try to parse numeric from string
+    const numeric = Number(base.replace(/[^0-9.]/g, ''));
+    if (!Number.isNaN(numeric) && numeric > 0) return formatRentShort(numeric);
+    return base;
+  }
+  const n = Number(value);
+  if (Number.isNaN(n) || n <= 0) return '';
+  if (n >= 10000000) return `\u20B9${(n / 10000000).toFixed(2)} Cr`;
+  if (n >= 100000) return `\u20B9${(n / 100000).toFixed(1)} L`;
+  if (n >= 1000) return `\u20B9${Math.round(n / 1000)}K`;
+  return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(n).replace(/^/, '\u20B9');
+};
+
 // Curated initial 6 for unauthorized users under "For Sale"
 const CURATED_FOR_SALE_TITLES = [
   "Brigade Eternia",
@@ -729,12 +785,26 @@ const normalize = (p = {}) => {
     title,
     image: firstImage || p.image || p.img || p.src || PLACEHOLDER,
     location: p.location || p.city || p.area || p.town || "",
-    type: p.type || (p.bhk ? `${p.bhk}` : "") || p.propertyType || "",
-    area: p.area || p.sqft || p.size || "",
+    // Prefer explicit BHK for type label
+    type: (() => {
+      const bedrooms = p?.bhk ?? p?.bedrooms;
+      if (bedrooms !== undefined && bedrooms !== null && `${bedrooms}`.trim() !== '') {
+        return `${String(bedrooms).trim()}BHK`;
+      }
+      return p.type || p.propertyType || '';
+    })(),
+    // Area string normalized and suffixed with sqft (no space) if numeric
+    area: (() => {
+      const rawArea = p.area || p.area_sqft || p.built_up_area || p.carpet_area || p.plot_area || p.size || p.sqft;
+      if (rawArea === undefined || rawArea === null || rawArea === '') return '';
+      const s = `${rawArea}`;
+      return /sq/i.test(s) ? s : `${s}sqft`;
+    })(),
     price: p.price || p.rate || "",
     category: displayCategory,
     categoryNormalized: displayCategory.toString().trim().toLowerCase(),
     subcategory: p.subcategory,
+    property_type: p.property_type,
     raw: p,
   };
 };
@@ -816,6 +886,8 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
   const [showGate, setShowGate] = useState(false);
   const [showDubaiGate, setShowDubaiGate] = useState(false);
   const swiperRef = useRef(null);
+  // Live price map keyed by lowercased title -> { display: string, isMonthly: boolean }
+  const [livePriceMap, setLivePriceMap] = useState(new Map());
 
   // Fetch live For Sale properties for signed-in users so details route IDs match
   const [liveSale, setLiveSale] = useState([]);
@@ -855,6 +927,41 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
     fetchLive();
     return () => { cancelled = true; };
   }, [user]);
+
+  // Fetch live prices for all recent properties to replace "Price on Request"
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      try {
+        const { data: rows, error } = await propertyService.getAllProperties({
+          status: 'active',
+          sortBy: 'created_at',
+          sortOrder: 'desc',
+          pageSize: 120,
+        });
+        if (cancelled) return;
+        if (error) return;
+        const map = new Map();
+        (rows || []).forEach((p) => {
+          const key = (p?.title || '').toString().trim().toLowerCase();
+          if (!key) return;
+          const cat = (p?.category || '').toString().toLowerCase();
+          const hasRent = p?.rent_amount !== null && p?.rent_amount !== undefined;
+          const isMonthly = hasRent || cat === 'rent' || cat === 'lease';
+          const rawAmount = hasRent ? (p?.rent_amount ?? p?.price) : (p?.price ?? p?.rent_amount);
+          const display = isMonthly ? formatRentShort(rawAmount) : formatINRShort(rawAmount);
+          if (display) {
+            map.set(key, { display, isMonthly });
+          }
+        });
+        setLivePriceMap(map);
+      } catch {
+        // swallow
+      }
+    };
+    run();
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     const onResize = () => setPerView(isGuest ? 3 : getPerView());
@@ -1031,7 +1138,7 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
                 const originalIndex = data.findIndex((d) => d.id === it.id);
                 return (
                   <SwiperSlide key={`${it.id}-${idx}`}>
-                    <Card item={it} index={idx} dataIndex={originalIndex} onPropertyClick={onPropertyClick} isLoggedIn={!!user} />
+                    <Card item={it} index={idx} dataIndex={originalIndex} onPropertyClick={onPropertyClick} isLoggedIn={!!user} livePriceMap={livePriceMap} />
                   </SwiperSlide>
                 );
               })}
@@ -1045,7 +1152,7 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
                   <p className="text-gray-600 mb-6">Create a free account to access our complete collection of verified exclusive properties</p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <button onClick={() => setShowGate(false)} className="inline-flex justify-center items-center px-5 py-2.5 rounded-full bg-gray-100 text-gray-900 font-semibold hover:bg-gray-200 border border-gray-200">May be Later</button>
-                    <a href="/#/auth" className="inline-flex justify-center items-center px-5 py-2.5 rounded-full bg-[#040449] text-white font-semibold hover:opacity-90 shadow">Create Account</a>
+                    <a href="/#/auth" className="inline-flex justify-center items-center px-5 py-2.5 rounded-full bg-[#040449] text-white font-semibold hover:opacity-90 shadow">Log In/Sign Up</a>
                   </div>
                 </div>
               </div>
@@ -1059,7 +1166,7 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
                   <p className="text-gray-600 mb-6">Create a free account to access our complete collection of verified exclusive properties</p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <button onClick={() => setShowDubaiGate(false)} className="inline-flex justify-center items-center px-5 py-2.5 rounded-full bg-gray-100 text-gray-900 font-semibold hover:bg-gray-200 border border-gray-200">May be Later</button>
-                    <a href="/#/auth" className="inline-flex justify-center items-center px-5 py-2.5 rounded-full bg-[#040449] text-white font-semibold hover:opacity-90 shadow">Create Account</a>
+                    <a href="/#/auth" className="inline-flex justify-center items-center px-5 py-2.5 rounded-full bg-[#040449] text-white font-semibold hover:opacity-90 shadow">Login/Sign Up</a>
                   </div>
                 </div>
               </div>
@@ -1085,7 +1192,7 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
 }
 
 // Card component - UPDATED
-function Card({ item, index, onPropertyClick, dataIndex, isLoggedIn }) {
+function Card({ item, index, onPropertyClick, dataIndex, isLoggedIn, livePriceMap }) {
   const { id, title, image, location, type, area, price } = item;
   const imgFirst = index % 2 === 0;
 
@@ -1127,12 +1234,39 @@ function Card({ item, index, onPropertyClick, dataIndex, isLoggedIn }) {
         {title}
       </h3>
       <div className="text-sm text-gray-600">{location}</div>
+      {(item.property_type || type) && (
+        <div className="text-sm text-gray-600">
+          {(item.property_type ? item.property_type.replace(/_/g, ' ') : 'Residential')}
+          {type ? `/${type}` : ''}
+        </div>
+      )}
       <div className="mt-1 grid grid-cols-2 gap-2 text-sm text-gray-500">
         <span className="truncate">{area}</span>
         <span className="text-right">{type}</span>
       </div>
       <div className="mt-3 flex items-center justify-between">
-        <div className="text-2xl font-bold text-gray-900">{price}</div>
+        {(() => {
+          const cat = (item.categoryNormalized || '').toLowerCase();
+          const isMonthly = cat === 'for rent' || cat === 'luxury rentals';
+          let display = isMonthly ? formatRentShort(price) : formatINRShort(price);
+          if (!display) {
+            const key = (item.title || '').toString().trim().toLowerCase();
+            const live = livePriceMap && livePriceMap.get(key);
+            if (live && live.display) {
+              const monthly = isMonthly || live.isMonthly;
+              return (
+                <div className="text-2xl font-bold text-gray-900">
+                  {monthly ? `${live.display}/month` : live.display}
+                </div>
+              );
+            }
+          }
+          return (
+            <div className="text-2xl font-bold text-gray-900">
+              {display ? (isMonthly ? `${display}/month` : display) : (isMonthly ? '\u20B9—/month' : 'Price on Request')}
+            </div>
+          );
+        })()}
         <Link
           to={`/property/${id}`}
           className="rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white shadow transition-colors hover:bg-red-700"
