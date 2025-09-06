@@ -140,6 +140,8 @@ const HeroSection = () => {
         backgroundAttachment: isSafari ? 'scroll' : 'fixed',
         backgroundSize: 'cover',
         backgroundPosition: isSafari ? 'center center' : parallaxBackgroundPosition,
+        // Pull hero under the fixed navbar so the transparent navbar overlays the hero
+        marginTop: 'calc(var(--nav-height, 72px) * -1)'
       }}
     >
       <div className="absolute inset-0 bg-black/20 z-0" />

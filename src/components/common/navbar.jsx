@@ -150,6 +150,11 @@ const Navbar = () => {
   const userName = userProfile?.full_name || currentUser?.user_metadata?.full_name || currentUser?.email?.split('@')[0];
   const userAvatar = userProfile?.avatar_url || currentUser?.user_metadata?.avatar_url || null;
 
+  // Determine if we are on the homepage (HeroSection is rendered on '/')
+  const isHome = location.pathname === '/';
+
+  const transparentAtTop = isHome && !isScrolled;
+
   return (
     <motion.nav
       id="site-nav"
@@ -157,7 +162,7 @@ const Navbar = () => {
       variants={headerVariants}
       initial="show"
       animate={effectivelyHidden ? 'hide' : 'show'}
-      className="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-md"
+      className={`fixed top-0 left-0 w-full z-50 ${transparentAtTop ? 'bg-transparent' : 'bg-white/90'} ${transparentAtTop ? '' : 'backdrop-blur-md'} transition-colors duration-300`}
       style={{
         pointerEvents: effectivelyHidden ? 'none' : 'auto',
         boxShadow: isScrolled ? '0 4px 12px rgba(0,0,0,0.08)' : 'none',
