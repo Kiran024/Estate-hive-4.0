@@ -150,14 +150,14 @@ const AiAgentEcosystem = () => {
           >
             <motion.button
               variants={cardVariants}
-              className="bg-[#040449] text-white px-8 py-4 rounded-full text-lg font-semibold shadow-lg hover:bg-red-700 transition duration-300 transform hover:scale-105 w-full sm:w-auto"
+              className="bg-[#040449] text-white px-8 py-2 rounded-full text-lg font-semibold shadow-lg hover:bg-red-700 transition duration-300 transform hover:scale-105 w-full sm:w-auto"
             >
               See AI in Action
             </motion.button>
             <motion.button
               variants={cardVariants}
               transition={{ ...cardVariants.transition, delay: 0.1 }}
-              className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full text-lg font-semibold shadow-lg hover:bg-white hover:text-red-600 transition duration-300 transform hover:scale-105 w-full sm:w-auto"
+              className="bg-transparent border-2 border-white text-white px-8 py-2 rounded-full text-lg font-semibold shadow-lg hover:bg-white hover:text-red-600 transition duration-300 transform hover:scale-105 w-full sm:w-auto"
             >
               Request Demo
             </motion.button>

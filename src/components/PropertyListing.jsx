@@ -695,6 +695,8 @@ const formatINRShort = (value) => {
 };
 
 // Format monthly rent in short units with rupee symbol (K/L/Cr)
+// Note: Many rent values in the data are stored as thousands (e.g., 85 => 85K).
+// To reflect this, values < 1000 are interpreted as thousands.
 const formatRentShort = (value) => {
   const rupee = '\u20B9';
   if (value === null || value === undefined || value === '') return '';
@@ -719,8 +721,9 @@ const formatRentShort = (value) => {
   if (Number.isNaN(n) || n <= 0) return '';
   if (n >= 10000000) return `\u20B9${(n / 10000000).toFixed(2)} Cr`;
   if (n >= 100000) return `\u20B9${(n / 100000).toFixed(1)} L`;
+  // Treat values under 1000 as thousands (e.g., 85 => 85K)
   if (n >= 1000) return `\u20B9${Math.round(n / 1000)}K`;
-  return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(n).replace(/^/, '\u20B9');
+  return `\u20B9${Math.round(n)}K`;
 };
 
 // Curated initial 6 for unauthorized users under "For Sale"
@@ -1195,6 +1198,15 @@ export default function PropertyListing({ listings, onPropertyClick, showLoginPr
 function Card({ item, index, onPropertyClick, dataIndex, isLoggedIn, livePriceMap }) {
   const { id, title, image, location, type, area, price } = item;
   const imgFirst = index % 2 === 0;
+  // Normalize labels to avoid duplicate BHK and ensure spacing
+  const propertyTypeLabel = (item.property_type ? item.property_type.replace(/_/g, ' ') : 'Residential');
+  const typeLabel = (() => {
+    const t = (type || '').toString();
+    return t
+      .replace(/BHK\s*BHK/gi, 'BHK')
+      .replace(/(\d)\s*BHK/gi, '$1 BHK')
+      .trim();
+  })();
 
   const ImageBlock = (
     <div className="relative w-full h-[240px] md:h-[250px] lg:h-[260px] bg-gray-100">
@@ -1236,19 +1248,69 @@ function Card({ item, index, onPropertyClick, dataIndex, isLoggedIn, livePriceMa
       <div className="text-sm text-gray-600">{location}</div>
       {(item.property_type || type) && (
         <div className="text-sm text-gray-600">
-          {(item.property_type ? item.property_type.replace(/_/g, ' ') : 'Residential')}
-          {type ? `/${type}` : ''}
+          {propertyTypeLabel}
+          {typeLabel ? `/${typeLabel}` : ''}
         </div>
       )}
       <div className="mt-1 grid grid-cols-2 gap-2 text-sm text-gray-500">
         <span className="truncate">{area}</span>
-        <span className="text-right">{type}</span>
+        <span className="text-right"></span>
       </div>
       <div className="mt-3 flex items-center justify-between">
         {(() => {
           const cat = (item.categoryNormalized || '').toLowerCase();
-          const isMonthly = cat === 'for rent' || cat === 'luxury rentals';
-          let display = isMonthly ? formatRentShort(price) : formatINRShort(price);
+          const rawCat = (item.raw?.category || '').toString().trim().toLowerCase();
+          // Lists for special handling under For Sale
+          // 1) Force Price on Request for these titles (exclude ones that should show value)
+          const porTitles = new Set([
+            'brigade eternia',
+            'l&t elara celestia',
+            'sb urban park',
+            'sumadhura epitome',
+            'century trails',
+            'signature one',
+            'brigade atmosphere',
+            'assetz zen and sato',
+          ]);
+          // 2) Titles that should show value without "/month"
+          const noMonthTitles = new Set([
+            'montira by rare earth',
+            'lodha mirabelle',
+            'keya life by the lake',
+          ]);
+          const normalizedTitle = (item.title || '').toString().trim().toLowerCase();
+          const normalizedTitleClean = normalizedTitle.replace(/\s+/g, ' ');
+          const inNoMonthList = noMonthTitles.has(normalizedTitleClean);
+          if (cat === 'for sale' && porTitles.has(normalizedTitleClean)) {
+            return (
+              <div className="text-2xl font-bold text-gray-900">Price on Request</div>
+            );
+          }
+          // For specific For Sale titles, show value without "/month"
+          if (cat === 'for sale' && inNoMonthList) {
+            const valuePref = (item.raw && item.raw.rent_amount !== undefined && item.raw.rent_amount !== null)
+              ? item.raw.rent_amount
+              : price;
+            const displayNoMonth = formatRentShort(valuePref);
+            return (
+              <div className="text-2xl font-bold text-gray-900">{displayNoMonth}</div>
+            );
+          }
+          const priceStr = (price || '').toString();
+          const mentionsMonthly = /(?:\/|per\s*)month\b/i.test(priceStr);
+          const hasRentAmount = item.raw && item.raw.rent_amount !== undefined && item.raw.rent_amount !== null;
+          // Consider EH tabs with rent/lease or rent_amount as monthly as well
+          const isMonthly = (
+            cat === 'for rent' ||
+            cat === 'luxury rentals' ||
+            rawCat === 'rent' ||
+            rawCat === 'lease' ||
+            hasRentAmount ||
+            mentionsMonthly
+          );
+          const valueToFormat = hasRentAmount ? item.raw.rent_amount : price;
+          let display = isMonthly ? formatRentShort(valueToFormat) : formatINRShort(valueToFormat);
+          const suppressMonthlySuffix = cat === 'luxury rentals' || (cat === 'for sale' && inNoMonthList);
           if (!display) {
             const key = (item.title || '').toString().trim().toLowerCase();
             const live = livePriceMap && livePriceMap.get(key);
@@ -1256,14 +1318,14 @@ function Card({ item, index, onPropertyClick, dataIndex, isLoggedIn, livePriceMa
               const monthly = isMonthly || live.isMonthly;
               return (
                 <div className="text-2xl font-bold text-gray-900">
-                  {monthly ? `${live.display}/month` : live.display}
+                  {monthly && !suppressMonthlySuffix ? `${live.display}/month` : live.display}
                 </div>
               );
             }
           }
           return (
             <div className="text-2xl font-bold text-gray-900">
-              {display ? (isMonthly ? `${display}/month` : display) : (isMonthly ? '\u20B9—/month' : 'Price on Request')}
+              {display ? (isMonthly && !suppressMonthlySuffix ? `${display}/month` : display) : (isMonthly && !suppressMonthlySuffix ? '\u20B9—/month' : 'Price on Request')}
             </div>
           );
         })()}

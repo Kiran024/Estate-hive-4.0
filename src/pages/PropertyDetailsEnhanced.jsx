@@ -1,3 +1,5 @@
+
+
 import React, { useEffect, useRef, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from '@tanstack/react-query';
@@ -26,6 +28,11 @@ export default function PropertyDetailsEnhanced() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showImageModal, setShowImageModal] = useState(false);
   const mapContainer = useRef(null);
+  // Interactive contact UI state
+  const [showPhoneCard, setShowPhoneCard] = useState(false);
+  const [showInquiryModal, setShowInquiryModal] = useState(false);
+  const [inquiryType, setInquiryType] = useState('Feedback');
+  const [inquiryMessage, setInquiryMessage] = useState('');
 
   // Fetch property data
   const { data: propertyResponse, isLoading, error } = useQuery({
@@ -574,12 +581,10 @@ Don't miss this opportunity to ${property.category === 'sale' ? 'own' : 'rent'} 
                     </span>
                   )}
                 </div>
-                <p className="text-3xl font-bold text-gray-900">
+                <p className="text-3xl font-bold text-gray-900"> 
                   {formatPrice(property.price || property.rent_amount)}
                 </p>
-                {property.rent_frequency && (
-                  <p className="text-sm text-gray-600">per {property.rent_frequency}</p>
-                )}
+                {/* per-month frequency removed as requested */}
                 {property.price_per_sqft && (
                   <p className="text-sm text-gray-600 mt-1">
                     ₹{property.price_per_sqft.toLocaleString()}/sq.ft
@@ -599,19 +604,105 @@ Don't miss this opportunity to ${property.category === 'sale' ? 'own' : 'rent'} 
               )}
 
               {/* Contact Actions */}
-              <div className="space-y-3">
-                <button className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+              <div className="space-y-3 relative">
+                {/* Contact Estate Hive (phone card) */}
+                <button onClick={() => setShowPhoneCard(v => !v)} className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
                   <Phone className="w-4 h-4" />
-                  Contact Owner
+                  Contact Estate Hive
                 </button>
-                <button className="w-full py-3 border border-blue-600 text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors flex items-center justify-center gap-2">
+                {showPhoneCard && (
+                  <div className="absolute left-0 right-0 -top-2 translate-y-[-100%] z-20 flex justify-center">
+                    <div className="w-full max-w-sm rounded-xl border border-gray-200 bg-white p-4 shadow-2xl transition-all duration-300 ease-out transform opacity-100 scale-100">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="text-sm text-gray-500">Call Estate Hive</p>
+                          <a href="tel:+919036317765" className="text-lg font-semibold text-gray-900">+91 90363 17765</a>
+                        </div>
+                        <button onClick={() => setShowPhoneCard(false)} className="p-1 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100" aria-label="Close">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="mt-3 flex gap-2">
+                        <a href="tel:+919036317765" className="flex-1 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors text-center">Call Now</a>
+                        <button onClick={() => navigator.clipboard && navigator.clipboard.writeText('+919036317765')} className="flex-1 py-2 rounded-lg border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-50 transition-colors">Copy Number</button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Send Inquiry (modal trigger) */}
+                <button onClick={() => setShowInquiryModal(true)} className="w-full py-3 border border-blue-600 text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors flex items-center justify-center gap-2">
                   <Mail className="w-4 h-4" />
                   Send Inquiry
                 </button>
-                <button className="w-full py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors">
-                  Schedule Site Visit
-                </button>
+
+                {/* Schedule Site Visit */}
+                <a href="https://cal.com/estatehive/discovery-call" target="_blank" rel="noopener noreferrer" className="block w-full py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors text-center">Schedule Site Visit</a>
               </div>
+
+              {showInquiryModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                  <div className="absolute inset-0 bg-black/50" onClick={() => setShowInquiryModal(false)} />
+                  <div className="relative z-10 w-full max-w-lg bg-white rounded-xl shadow-2xl p-6 transition-all duration-300 transform">
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h3 className="text-xl font-semibold">Send Inquiry</h3>
+                        <p className="text-sm text-gray-500">Send via Email to hello@estatehive.in</p>
+                      </div>
+                      <button onClick={() => setShowInquiryModal(false)} className="p-1 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100" aria-label="Close">
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                    <div className="mb-4 flex gap-2">
+                      {['Feedback','Complaint','Suggestion'].map((opt) => (
+                        <button
+                          key={opt}
+                          onClick={() => setInquiryType(opt)}
+                          className={[ 'px-3 py-1.5 rounded-full text-sm border transition-colors', inquiryType === opt ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-300 text-gray-700 hover:bg-gray-50' ].join(' ')}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                    <textarea value={inquiryMessage} onChange={(e) => setInquiryMessage(e.target.value)} placeholder="Write your message here..." className="w-full h-32 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <div className="mt-4 flex flex-col sm:flex-row gap-3">
+                      <button
+                        onClick={() => {
+                          const to = 'hello@estatehive.in';
+                          const subject = `Property Inquiry: ${property?.title || ''} (ID: ${property?.id || ''})`;
+                          const lines = [
+                            'Welcome to Estate Hive',
+                            `Type: ${inquiryType}`,
+                            `Property: ${property?.title || ''}`,
+                            `ID: ${property?.id || ''}`,
+                            `Link: ${window.location.origin}/property/${property?.id}`,
+                            '',
+                            inquiryMessage,
+                            '',
+                            `Sender: ${user?.email || 'Your email'}`
+                          ];
+                          const body = encodeURIComponent(lines.join('\n'));
+                          const gmailHref = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subject)}&body=${body}`;
+                          const mailtoHref = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${body}`;
+                          const win = window.open(gmailHref, '_blank', 'noopener,noreferrer');
+                          if (!win) {
+                            try {
+                              window.location.href = mailtoHref;
+                            } catch {
+                              window.open(mailtoHref, '_self');
+                            }
+                          }
+                          setShowInquiryModal(false);
+                        }}
+                        className="flex-1 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                      >
+                        Send via Email
+                      </button>
+                      <button onClick={() => setShowInquiryModal(false)} className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors">Cancel</button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Property ID */}
               <div className="mt-6 pt-6 border-t border-gray-200">

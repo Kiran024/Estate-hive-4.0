@@ -24,6 +24,7 @@ const ResetPassword     = lazy(() => import('./pages/ResetPassword'));
 const HomePage          = lazy(() => import('./components/homepage'));
 const AIAgentEcosystem  = lazy(() => import('./components/technologies/AIAgentEcosystem'));
 const Blog              = lazy(() => import('./components/Blog'));
+const BlogDetails       = lazy(() => import('./components/BlogDetails'));
 const EHAccelerate      = lazy(() => import('./components/services/EHAccelerate'));
 const EHDesign          = lazy(() => import('./components/services/EHDesign'));
 const EHLiving          = lazy(() => import('./components/services/EHLiving'));
@@ -121,6 +122,7 @@ const Layout = () => {
 
             <Route path="/ai-agent-ecosystem" element={<AIAgentEcosystem />} />
             <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogDetails />} />
             <Route path="/eh-accelerate" element={<EHAccelerate />} />
             <Route path="/eh-design" element={<EHDesign />} />
             <Route path="/eh-living" element={<EHLiving />} />
