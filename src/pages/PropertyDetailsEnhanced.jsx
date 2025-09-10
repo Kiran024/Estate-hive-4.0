@@ -1,6 +1,4 @@
-
-
-import React, { useEffect, useRef, useState } from "react";
+﻿import React, { useEffect, useRef, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from '@tanstack/react-query';
 import { propertyService } from '../services/propertyService';
@@ -43,6 +41,35 @@ export default function PropertyDetailsEnhanced() {
   });
   
   const property = propertyResponse?.data;
+
+  // Helper: price-on-request logic aligned with homepage For Sale items
+  const isPriceOnRequest = (p) => {
+    if (!p) return false;
+    if (p.category === 'sale') {
+      if (p.price === null || p.price === 0) return true;
+      const m = p.metadata || {};
+      if (m.price_on_request || m.priceOnRequest || m.price_label === 'Price on Request') return true;
+      const priceOnRequestTitles = new Set([
+        'Konig Villas North County',
+        'Barca At Godrej MSR City',
+        'Hybenden Clifton',
+        'Ebony at Brigade Orchards',
+        'Provident Deansgate',
+        'Birla Trimaya Phase 3',
+        'Arvind The Park',
+        'Earthsong by Manyata',
+        'The Secret Lake',
+      ]);
+      if (typeof p.title === 'string' && priceOnRequestTitles.has(p.title.trim())) return true;
+    }
+    return false;
+  };
+
+  const renderPrice = (p) => {
+    return isPriceOnRequest(p)
+      ? 'Price on Request'
+      : formatPrice(p?.price || p?.rent_amount);
+  };
 
   // Fetch similar properties - get more for carousel
   const { data: similarPropertiesResponse } = useQuery({
@@ -329,10 +356,10 @@ const goToPage = (pageIndex) => {
                     property.subcategory === 'eh_dubai' ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white' :
                     'bg-gray-100 text-gray-700'
                   }`}>
-                    {property.subcategory === 'eh_commercial' ? '🏢 EH Commercial' :
-                     property.subcategory === 'eh_verified' ? '✓ EH Verified' :
-                     property.subcategory === 'eh_signature' ? '⭐ EH Signature™' :
-                     property.subcategory === 'eh_dubai' ? '🌍 EH Dubai' :
+                    {property.subcategory === 'eh_commercial' ? 'EH Commercial' :
+                     property.subcategory === 'eh_verified' ? ' EH Verified' :
+                     property.subcategory === 'eh_signature' ? 'EH Signature' :
+                     property.subcategory === 'eh_dubai' ? ' EH Dubai' :
                      property.subcategory}
                   </span>
                 )}
@@ -366,6 +393,20 @@ const goToPage = (pageIndex) => {
               </div>
             </div>
             
+
+
+
+
+
+
+
+
+
+
+
+
+
+          
             <div className="flex items-center gap-3">
               <WishlistButton 
                 propertyId={parseInt(id)} 
@@ -582,22 +623,22 @@ Don't miss this opportunity to ${property.category === 'sale' ? 'own' : 'rent'} 
                   )}
                 </div>
                 <p className="text-3xl font-bold text-gray-900"> 
-                  {formatPrice(property.price || property.rent_amount)}
+                  {renderPrice(property)}
                 </p>
                 {/* per-month frequency removed as requested */}
                 {property.price_per_sqft && (
                   <p className="text-sm text-gray-600 mt-1">
-                    ₹{property.price_per_sqft.toLocaleString()}/sq.ft
+                    {property.price_per_sqft.toLocaleString()}/sq.ft
                   </p>
                 )}
               </div>
 
               {/* EMI Calculator (for sale properties) */}
-              {property.category === 'sale' && property.price && (
+              {property.category === 'sale' && property.price && !isPriceOnRequest(property) && (
                 <div className="mb-6 p-4 bg-blue-50 rounded-lg">
                   <p className="text-sm font-medium text-blue-900 mb-1">Estimated EMI</p>
                   <p className="text-xl font-bold text-blue-900">
-                    ₹{Math.round(property.price * 0.007).toLocaleString()}/month
+                    {Math.round(property.price * 0.007).toLocaleString()}/month
                   </p>
                   <p className="text-xs text-blue-700 mt-1">@ 8.5% for 20 years</p>
                 </div>
@@ -796,7 +837,7 @@ Don't miss this opportunity to ${property.category === 'sale' ? 'own' : 'rent'} 
                 {similar.neighborhood || similar.city}
               </p>
               <p className="text-xl font-bold text-blue-600">
-                {formatPrice(similar.price || similar.rent_amount)}
+                {renderPrice(similar)}
               </p>
               <div className="flex items-center gap-4 mt-3 text-gray-600 text-sm">
                 {similar.bedrooms && (
@@ -843,3 +884,5 @@ Don't miss this opportunity to ${property.category === 'sale' ? 'own' : 'rent'} 
     </div>
   );
 }
+
+ 

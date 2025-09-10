@@ -1,8 +1,8 @@
 // Property Types and Enums
 export const PropertyType = {
-  RESIDENTIAL: 'residential',
+  RESIDENTIAL: 'Residential',
   COMMERCIAL: 'commercial',
-  LAND: 'land',
+  LAND: 'Land',
   INDUSTRIAL: 'industrial',
   AGRICULTURAL: 'agricultural',
   MIXED_USE: 'mixed_use'

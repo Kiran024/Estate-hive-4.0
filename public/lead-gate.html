@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Estate Hive - Quick Callback</title>
+    <style>
+      :root {
+        --bg: #0b132b;
+        --bg-2: #1c2541;
+        --accent: #5bc0be;
+        --accent-2: #3aafa9;
+        --muted: #b8c1ec;
+        --card: #ffffff;
+        --text: #0f172a;
+        --error: #ef4444;
+        --ok: #16a34a;
+      }
+      * { box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        margin: 0;
+        background: radial-gradient(1200px 600px at 10% 0%, var(--bg-2), var(--bg));
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        color: var(--text);
+      }
+      .page-wrap { min-height: 100%; display: grid; place-items: center; padding: 16px; }
+      .modal {
+        width: 100%; max-width: 1100px; background: var(--card); border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.2);
+        overflow: hidden; display: grid; grid-template-columns: 1fr;
+      }
+      @media (min-width: 900px) { .modal { grid-template-columns: 1.1fr 1fr; } }
+      .promo { background: linear-gradient(135deg, var(--bg-2) 0%, var(--bg) 60%); color: white; position: relative; padding: 20px 20px 8px 20px; display: grid; grid-template-rows: auto 1fr auto; gap: 12px; }
+      .brand { display: flex; align-items: center; gap: 10px; min-height: 40px; }
+      .brand img { height: 36px; width: auto; }
+      .brand .fallback { font-weight: 700; letter-spacing: .3px; color: #e2e8f0; font-size: 14px; opacity: .9; }
+      .tagline { font-size: 14px; color: #cbd5e1; }
+      .gallery-wrap { position: relative; overflow: hidden; border-radius: 12px; background: rgba(255,255,255,0.06); }
+      .gallery { display: grid; grid-auto-flow: column; grid-auto-columns: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+      .card { scroll-snap-align: start; padding: 14px; display: grid; gap: 10px; }
+      .media { position: relative; width: 100%; padding-top: 62%; border-radius: 10px; overflow: hidden; background: linear-gradient(135deg, rgba(91,192,190,.25), rgba(58,175,169,.25)); outline: 1px solid rgba(255,255,255,.1); }
+      .media svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+      .prop-title { font-weight: 700; font-size: 16px; letter-spacing: .2px; }
+      .muted { color: #d1d5db; font-size: 13px; }
+      .badges { display: flex; flex-wrap: wrap; gap: 8px; }
+      .badge { font-size: 12px; padding: 6px 10px; border-radius: 999px; background: rgba(91,192,190,.15); color: #e6fffb; border: 1px solid rgba(91,192,190,.35); }
+      .nav { display: flex; gap: 10px; justify-content: center; padding: 10px 0 4px 0; }
+      .nav button { background: rgba(255,255,255,.1); color: white; border: 1px solid rgba(255,255,255,.2); padding: 8px 12px; border-radius: 10px; cursor: pointer; }
+      .nav button:hover { background: rgba(255,255,255,.18); }
+
+      .form { padding: 20px 20px 24px 20px; display: grid; gap: 14px; }
+      @media (min-width: 520px) { .form { padding: 28px; gap: 16px; } }
+      .h1 { font-weight: 800; font-size: 24px; margin: 0; }
+      .sub { color: #475569; font-size: 14px; }
+      .grid { display: grid; gap: 12px; grid-template-columns: 1fr; }
+      @media (min-width: 720px) { .grid.two { grid-template-columns: 1fr 1fr; gap: 12px; } }
+      label { font-size: 13px; color: #334155; font-weight: 600; }
+      .field { display: grid; gap: 6px; }
+      input, select, textarea { width: 100%; padding: 12px 12px; border-radius: 10px; border: 1px solid #e5e7eb; outline: none; font-size: 14px; transition: border-color .15s, box-shadow .15s; }
+      input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(91,192,190,.25); }
+      .helper { font-size: 12px; color: #64748b; }
+      .error { color: var(--error); font-size: 13px; display: none; }
+      .cta { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 16px; font-weight: 700; letter-spacing: .2px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #062025; border: 0; border-radius: 12px; cursor: pointer; box-shadow: 0 10px 20px rgba(59, 130, 246, 0.12), 0 4px 8px rgba(56,189,248,.16); }
+      .cta:disabled { opacity: .6; cursor: not-allowed; }
+      .disclaimer { font-size: 12px; color: #64748b; }
+      .success { display:none; color: var(--ok); font-weight: 700; font-size: 14px; }
+      .footer-note { font-size: 12px; color: #94a3b8; text-align: center; padding: 6px 0 0 0; }
+    </style>
+  </head>
+  <body>
+    <div class="page-wrap">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="leadTitle">
+        <section class="promo">
+          <div class="brand">
+            <!-- Add your Estate Hive logo file to public/logo.png to show it here. -->
+            <img id="estate-logo" src="./logo.png" alt="Estate Hive Logo" onerror="this.style.display='none'" />
+            <span class="fallback">Estate Hive</span>
+          </div>
+          <div class="tagline">Featured properties near you. Book a quick callback to get full details and access.</div>
+
+          <div class="gallery-wrap">
+            <div class="gallery" id="gallery" aria-label="Featured Properties">
+              <!-- Card 1 -->
+              <article class="card">
+                <div class="media" aria-hidden="true">
+                  <svg viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+                    <defs>
+                      <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
+                        <stop offset="0%" stop-color="#99f6e4"/>
+                        <stop offset="100%" stop-color="#22d3ee"/>
+                      </linearGradient>
+                    </defs>
+                    <rect width="400" height="250" fill="url(#g1)"/>
+                    <g fill="#064e3b" opacity="0.6">
+                      <path d="M50 170 L200 70 L350 170 L320 170 L320 210 L240 210 L240 150 L160 150 L160 210 L80 210 L80 170 Z"/>
+                    </g>
+                  </svg>
+                </div>
+                <div class="prop-title">Skyline Heights, 3BHK</div>
+                <div class="muted">Jubilee Hills - Hyderabad</div>
+                <div class="badges">
+                  <span class="badge">Rs 1.2 Cr</span>
+                  <span class="badge">2,100 sq.ft</span>
+                  <span class="badge">With Pool</span>
+                </div>
+              </article>
+
+              <!-- Card 2 -->
+              <article class="card">
+                <div class="media" aria-hidden="true">
+                  <svg viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+                    <defs>
+                      <linearGradient id="g2" x1="0" x2="1" y1="0" y2="1">
+                        <stop offset="0%" stop-color="#fde68a"/>
+                        <stop offset="100%" stop-color="#f59e0b"/>
+                      </linearGradient>
+                    </defs>
+                    <rect width="400" height="250" fill="url(#g2)"/>
+                    <g fill="#4b2e05" opacity="0.5">
+                      <circle cx="120" cy="140" r="60"/>
+                      <rect x="190" y="80" width="150" height="100" rx="12"/>
+                    </g>
+                  </svg>
+                </div>
+                <div class="prop-title">Palm Grove Villas</div>
+                <div class="muted">Whitefield - Bengaluru</div>
+                <div class="badges">
+                  <span class="badge">Rs 2.4 Cr</span>
+                  <span class="badge">4,000 sq.ft</span>
+                  <span class="badge">Gated Community</span>
+                </div>
+              </article>
+
+              <!-- Card 3 -->
+              <article class="card">
+                <div class="media" aria-hidden="true">
+                  <svg viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+                    <defs>
+                      <linearGradient id="g3" x1="0" x2="1" y1="0" y2="1">
+                        <stop offset="0%" stop-color="#c7d2fe"/>
+                        <stop offset="100%" stop-color="#6366f1"/>
+                      </linearGradient>
+                    </defs>
+                    <rect width="400" height="250" fill="url(#g3)"/>
+                    <g fill="#111827" opacity="0.4">
+                      <rect x="40" y="90" width="320" height="90" rx="8"/>
+                      <rect x="70" y="70" width="80" height="40" rx="6"/>
+                    </g>
+                  </svg>
+                </div>
+                <div class="prop-title">Aurora Business Park</div>
+                <div class="muted">BKC - Mumbai</div>
+                <div class="badges">
+                  <span class="badge">Lease Rs 180/sq.ft</span>
+                  <span class="badge">Grade A</span>
+                  <span class="badge">Near Metro</span>
+                </div>
+              </article>
+            </div>
+            <div class="nav">
+              <button type="button" id="prev" aria-label="Previous">&lt;</button>
+              <button type="button" id="next" aria-label="Next">&gt;</button>
+            </div>
+          </div>
+
+          <div class="footer-note">Add your logo to <code>public/logo.png</code> to display it above.</div>
+        </section>
+
+        <section class="form">
+          <h1 id="leadTitle" class="h1">Request a quick callback</h1>
+          <p class="sub">Tell us a bit about your need. We'll call you shortly and unlock full access to Estate Hive.</p>
+
+          <form id="leadForm" novalidate>
+            <div class="grid two">
+              <div class="field">
+                <label for="fullName">Full name</label>
+                <input id="fullName" name="fullName" type="text" placeholder="John Doe" required />
+              </div>
+              <div class="field">
+                <label for="phone">Phone</label>
+                <input id="phone" name="phone" type="tel" placeholder="98765 43210" required pattern="[0-9+\-()\s]{8,}" />
+              </div>
+            </div>
+
+            <div class="grid two">
+              <div class="field">
+                <label for="email">Email (optional)</label>
+                <input id="email" name="email" type="email" placeholder="you@example.com" />
+                <div class="helper">We won't spam you.</div>
+              </div>
+              <div class="field">
+                <label for="interest">Interested in</label>
+                <select id="interest" name="interest">
+                  <option value="Skyline Heights">Skyline Heights, Hyderabad</option>
+                  <option value="Palm Grove Villas">Palm Grove Villas, Bengaluru</option>
+                  <option value="Aurora Business Park">Aurora Business Park, Mumbai</option>
+                  <option value="Other">Other / Not sure</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid two">
+              <div class="field">
+                <label for="budget">Budget range</label>
+                <select id="budget" name="budget">
+                  <option value="">Select...</option>
+                  <option>Rs 50L - Rs 1Cr</option>
+                  <option>Rs 1Cr - Rs 2Cr</option>
+                  <option>Rs 2Cr - Rs 4Cr</option>
+                  <option>Rs 4Cr +</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="city">City</label>
+                <input id="city" name="city" type="text" placeholder="Hyderabad" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="notes">Notes (optional)</label>
+              <textarea id="notes" name="notes" rows="3" placeholder="Anything specific you're looking for?"></textarea>
+            </div>
+
+            <div class="error" id="errorBox">Please enter your name and a valid phone number.</div>
+            <div class="success" id="successBox">Thanks! Redirecting you to Estate Hive...</div>
+
+            <button class="cta" id="submitBtn" type="submit">Request Callback</button>
+            <div class="disclaimer">By submitting, you agree to be contacted by Estate Hive for this inquiry. No account is created yet.</div>
+          </form>
+        </section>
+      </div>
+    </div>
+
+    <script>
+      (function() {
+        const STORAGE_DATA = 'estateHiveLead';
+        const BYPASS_UNTIL_KEY = 'estateHiveLeadGateBypassUntil';
+
+        function getParam(name, fallback) {
+          try {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(name) || fallback;
+          } catch (_) { return fallback; }
+        }
+
+        function isAuthenticated() {
+          try {
+            for (let i = 0; i < localStorage.length; i++) {
+              const k = localStorage.key(i) || '';
+              if (/^sb-.*-auth-token$/.test(k)) {
+                const v = localStorage.getItem(k);
+                if (!v) continue;
+                try { JSON.parse(v); } catch (_) {}
+                return true;
+              }
+            }
+          } catch (_) {}
+          return false;
+        }
+
+        const returnTo = getParam('returnTo', '/index.html');
+        const isEmbed = getParam('embed', '') === '1';
+
+        // If user is already authenticated, skip the lead gate
+        try {
+          if (isAuthenticated()) {
+            if (isEmbed && window.parent) {
+              try { window.parent.postMessage({ type: 'leadGateAuthenticated' }, '*'); } catch (_) {}
+            } else {
+              window.location.replace(returnTo);
+            }
+            return;
+          }
+        } catch (_) {}
+
+        const form = document.getElementById('leadForm');
+        const errorBox = document.getElementById('errorBox');
+        const successBox = document.getElementById('successBox');
+        const submitBtn = document.getElementById('submitBtn');
+
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          errorBox.style.display = 'none';
+          successBox.style.display = 'none';
+
+          const name = document.getElementById('fullName').value.trim();
+          const phone = document.getElementById('phone').value.trim();
+          const email = document.getElementById('email').value.trim();
+          const interest = document.getElementById('interest').value;
+          const budget = document.getElementById('budget').value;
+          const city = document.getElementById('city').value.trim();
+          const notes = document.getElementById('notes').value.trim();
+
+          const phoneOk = /^[0-9+\-()\s]{8,}$/.test(phone);
+          if (!name || !phoneOk) {
+            errorBox.style.display = 'block';
+            return;
+          }
+
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Submitting...';
+
+          // Save locally (no API per requirement)
+          let bypassUntil = Date.now();
+          try {
+            const leadId = 'lead_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+            const payload = { id: leadId, ts: new Date().toISOString(), name, phone, email, interest, budget, city, notes };
+            localStorage.setItem(STORAGE_DATA, JSON.stringify(payload));
+            // Allow a short bypass window so the user sees the site after submission
+            const bypassMs = 10 * 60 * 1000; // 10 minutes
+            bypassUntil = Date.now() + bypassMs;
+            localStorage.setItem(BYPASS_UNTIL_KEY, String(bypassUntil));
+            try { window.parent && window.parent.postMessage({ type: 'leadGateCompleted', bypassUntil, leadId }, '*'); } catch (_) {}
+          } catch (_) {}
+
+          successBox.style.display = 'block';
+          // Small delay to show success then go to app
+          setTimeout(() => {
+            if (!isEmbed) {
+              window.location.href = returnTo;
+            }
+          }, 600);
+        });
+
+        // Simple gallery navigation
+        const scroller = document.getElementById('gallery');
+        document.getElementById('prev').addEventListener('click', () => {
+          scroller.scrollBy({ left: -scroller.clientWidth, behavior: 'smooth' });
+        });
+        document.getElementById('next').addEventListener('click', () => {
+          scroller.scrollBy({ left: scroller.clientWidth, behavior: 'smooth' });
+        });
+      })();
+    </script>
+  </body>
+  </html>
+

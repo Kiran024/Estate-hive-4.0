@@ -853,6 +853,7 @@ const buildSrcSetFromUrl = (url) => {
   if (!match) return undefined;
   const widths = [480, 768, 1080, 1440];
   const unique = new Map();
+  
   widths.forEach((w) => {
     const candidate = url
       .replace(/@\d+x-\d+/g, `@${w}x-100`)
@@ -1199,7 +1200,16 @@ function Card({ item, index, onPropertyClick, dataIndex, isLoggedIn, livePriceMa
   const { id, title, image, location, type, area, price } = item;
   const imgFirst = index % 2 === 0;
   // Normalize labels to avoid duplicate BHK and ensure spacing
-  const propertyTypeLabel = (item.property_type ? item.property_type.replace(/_/g, ' ') : 'Residential');
+  // For For Sale category, ensure first-letter capitalization for "Residential" and "Land"
+  const propertyTypeLabel = (() => {
+    const base = (item.property_type ? String(item.property_type).replace(/_/g, ' ') : 'Residential').trim();
+    const isForSale = (item.categoryNormalized || '').toLowerCase() === 'for sale';
+    if (!isForSale) return base;
+    const low = base.toLowerCase();
+    if (low.includes('Land')) return 'Land';
+    if (low.includes('Residential')) return 'Residential';
+    return low ? low.charAt(0).toUpperCase() + low.slice(1) : 'Residential';
+  })();
   const typeLabel = (() => {
     const t = (type || '').toString();
     return t
@@ -1248,8 +1258,24 @@ function Card({ item, index, onPropertyClick, dataIndex, isLoggedIn, livePriceMa
       <div className="text-sm text-gray-600">{location}</div>
       {(item.property_type || type) && (
         <div className="text-sm text-gray-600">
-          {propertyTypeLabel}
-          {typeLabel ? `/${typeLabel}` : ''}
+          {(() => {
+            const catNorm = (item.categoryNormalized || '').toLowerCase();
+            if (catNorm === 'luxury rentals') {
+              const pt = (() => {
+                const base = (item.property_type ? String(item.property_type).replace(/_/g, ' ') : 'Residential').trim();
+                const low = base.toLowerCase();
+                if (low.includes('Land')) return 'Land';
+                if (low.includes('residential')) return 'Residential';
+                return low ? low.charAt(0).toUpperCase() + low.slice(1) : 'Residential';
+              })();
+              let rawType = (item.raw?.type || item.raw?.property_subtype || item.type || '').toString().trim();
+              if (rawType) {
+                rawType = rawType.replace(/\s*BHK/i, ' BHK').replace(/\s+/g, ' ');
+              }
+              return rawType ? `${pt} - ${rawType}` : pt;
+            }
+            return `${propertyTypeLabel}${typeLabel ? `/${typeLabel}` : ''}`;
+          })()}
         </div>
       )}
       <div className="mt-1 grid grid-cols-2 gap-2 text-sm text-gray-500">
@@ -1272,6 +1298,31 @@ function Card({ item, index, onPropertyClick, dataIndex, isLoggedIn, livePriceMa
             'brigade atmosphere',
             'assetz zen and sato',
           ]);
+          // For Sale: if price looks like monthly (K/per month), fetch CRM sale price or show Price on Request
+          if (cat === 'for sale') {
+            const keyEarly = (item.title || '').toString().trim().toLowerCase();
+            const forcePorTitles = new Set(['lodha mirabelle', 'keya life by the lake']);
+            if (forcePorTitles.has(keyEarly)) {
+              return (
+                <div className="text-2xl font-bold text-gray-900">Price on Request</div>
+              );
+            }
+            const priceStrEarly = (price || '').toString();
+            const mentionsMonthlyEarly = /(?:\/|per\s*)month\b/i.test(priceStrEarly);
+            const hasKUnitEarly = /\b\d+(?:\.\d+)?\s*[kK]\b/.test(priceStrEarly) || /\bthousand\b/i.test(priceStrEarly);
+            const hasRentAmountEarly = item.raw && item.raw.rent_amount !== undefined && item.raw.rent_amount !== null;
+            if (hasRentAmountEarly || mentionsMonthlyEarly || hasKUnitEarly) {
+              const liveEarly = livePriceMap && livePriceMap.get(keyEarly);
+              if (liveEarly && liveEarly.display && !liveEarly.isMonthly) {
+                return (
+                  <div className="text-2xl font-bold text-gray-900">{liveEarly.display}</div>
+                );
+              }
+              return (
+                <div className="text-2xl font-bold text-gray-900">Price on Request</div>
+              );
+            }
+          }
           // 2) Titles that should show value without "/month"
           const noMonthTitles = new Set([
             'montira by rare earth',

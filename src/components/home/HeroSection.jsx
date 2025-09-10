@@ -132,6 +132,10 @@ const HeroSection = () => {
 
   const parallaxBackgroundPosition = `center ${-70 - scrollY * 0.12}px`;
 
+  const capitalize = (str) => (typeof str === 'string' && str.length > 0)
+    ? str.charAt(0).toUpperCase() + str.slice(1)
+    : str;
+
   return (
     <section
       className="scroll-smooth relative w-full min-h-[120vh] md:h-[150vh] bg-no-repeat bg-cover bg-center text-white overflow-hidden flex items-center justify-center"
@@ -255,7 +259,7 @@ const HeroSection = () => {
                   setRangeOpen(false);
                 }}
               >
-                <span>{propertyType || 'Choose Property Type'}</span>
+                <span>{propertyType ? capitalize(propertyType) : 'Choose Property Type'}</span>
                 <FiChevronDown size={18} className="text-gray-600" />
               </div>
               <AnimatePresence>
@@ -276,7 +280,7 @@ const HeroSection = () => {
                         }}
                         className="px-4 py-2 text-gray-800 hover:bg-gray-100 cursor-pointer"
                       >
-                        {type}
+                        {capitalize(type)}
                       </li>
                     ))}
                   </Motion.ul>

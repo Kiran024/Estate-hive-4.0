@@ -1,0 +1,23 @@
+﻿                {/* EH Category Badge */}
+                {property.subcategory && (
+                  <span className={`relative px-3 py-1 rounded-full text-xs font-bold shadow-lg ${
+                    property.subcategory === 'eh_commercial' ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white' :
+                    property.subcategory === 'eh_verified' ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' :
+                    property.subcategory === 'eh_signature' ? 'bg-gradient-to-r from-amber-500 to-yellow-600 text-white' :
+                    property.subcategory === 'eh_dubai' ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white' :
+                    'bg-gray-100 text-gray-700'
+                  }`}>
+                    <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      {property.subcategory === 'eh_commercial' ? 'EH Commercial' :
+                       property.subcategory === 'eh_verified' ? 'EH Verified' :
+                       property.subcategory === 'eh_signature' ? 'EH Signature' :
+                       property.subcategory === 'eh_dubai' ? 'EH Dubai' :
+                       property.subcategory}
+                    </span>
+                    {property.subcategory === 'eh_commercial' ? 'ðŸ¢ EH Commercial' :
+                     property.subcategory === 'eh_verified' ? 'âœ“ EH Verified' :
+                     property.subcategory === 'eh_signature' ? 'â­ EH Signatureâ„¢' :
+                     property.subcategory === 'eh_dubai' ? 'ðŸŒ EH Dubai' :
+                     property.subcategory}
+                  </span>
+                )}

@@ -8,6 +8,7 @@ import './AuthPage.css';
 
 import Navbar from './components/common/navbar';
 import Footer from './components/common/footer';
+import LeadGateOverlay from './components/LeadGateOverlay.jsx';
 
 // Query Client
 const queryClient = new QueryClient({
@@ -107,6 +108,8 @@ const Layout = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
+      {/* Lead gate overlay for unauthenticated users on home route */}
+      {pathname === '/' && <LeadGateOverlay />}
       {/* Keep Navbar mounted across all routes for global scroll-hide */}
       {!hideNavFooter && <Navbar />}
 

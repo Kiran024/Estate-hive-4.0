@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useLayoutEffect } from 'react';
+﻿import React, { useState, useEffect, useCallback, useMemo, useLayoutEffect } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { propertyService } from '../services/propertyService';
@@ -55,6 +55,45 @@ export default function AllPropertiesEnhanced() {
     page: 1,
     pageSize: 12
   });
+
+  // Removed static listing price overrides to prevent mismatches with details page
+
+  // Ensure proper rupee symbol on any price-like string
+  const ensureRupee = useCallback((s) => {
+    const t = (s ?? '').toString().trim();
+    if (!t) return t;
+    if (t.toLowerCase() === 'price on request') return t;
+    if (/^\u20B9/.test(t) || /^₹/.test(t)) return t;
+    if (/\b(cr|crore|l|lac|lakh|k|thousand)\b/i.test(t)) return `\u20B9${t}`;
+    return t;
+  }, []);
+
+  // Helper: align Price-on-Request logic with PropertyDetailsEnhanced.jsx
+  const isPriceOnRequest = useCallback((p) => {
+    if (!p) return false;
+    if (p.category === 'sale') {
+      if (p.price === null || p.price === 0) return true;
+      const m = p.metadata || {};
+      if (m.price_on_request || m.priceOnRequest || m.price_label === 'Price on Request') return true;
+      const priceOnRequestTitles = new Set([
+        'Konig Villas North County',
+        'Barca At Godrej MSR City',
+        'Hybenden Clifton',
+        'Ebony at Brigade Orchards',
+        'Provident Deansgate',
+        'Birla Trimaya Phase 3',
+        'Arvind The Park',
+        'Earthsong by Manyata',
+        'The Secret Lake',
+      ]);
+      if (typeof p.title === 'string' && priceOnRequestTitles.has(p.title.trim())) return true;
+    }
+    return false;
+  }, []);
+
+  const renderPrice = useCallback((p) => {
+    return isPriceOnRequest(p) ? 'Price on Request' : ensureRupee(formatPrice(p?.price || p?.rent_amount));
+  }, [isPriceOnRequest, ensureRupee]);
 
   // Debounce search input
   useEffect(() => {
@@ -319,7 +358,7 @@ useLayoutEffect(() => {
             }`}>
               {property.subcategory === 'eh_commercial' ? 'EH Commercial' :
                property.subcategory === 'eh_verified' ? 'EH Verified' :
-               property.subcategory === 'eh_signature' ? 'EH Signature™' :
+               property.subcategory === 'eh_signature' ? 'EH Signature' :
                property.subcategory === 'eh_dubai' ? 'EH Dubai' :
                property.subcategory}
             </span>
@@ -358,7 +397,7 @@ useLayoutEffect(() => {
         {/* Price */}
         <div className="flex items-start justify-between mb-2">
           <h3 className="text-xl font-bold text-gray-800">
-            {formatPrice(property.price || property.rent_amount)}
+            {renderPrice(property)}
           </h3>
           {property.price_negotiable && (
             <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
@@ -621,7 +660,7 @@ useLayoutEffect(() => {
               >
                 <div className="flex items-center gap-2">
                   <Star className="w-4 h-4" />
-                  EH Signature™
+                  EH Signature
                 </div>
               </button>
               <button
@@ -707,7 +746,7 @@ useLayoutEffect(() => {
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-medium text-gray-600">Min Price (₹)</label>
+                  <label className="text-xs font-medium text-gray-600">Min Price (â‚¹)</label>
                   <input
                     type="number"
                     placeholder="Min"
@@ -717,7 +756,7 @@ useLayoutEffect(() => {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-gray-600">Max Price (₹)</label>
+                  <label className="text-xs font-medium text-gray-600">Max Price (â‚¹)</label>
                   <input
                     type="number"
                     placeholder="Max"
@@ -1158,3 +1197,4 @@ useLayoutEffect(() => {
     </div>
   );
 }
+
